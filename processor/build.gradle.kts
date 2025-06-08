@@ -17,5 +17,6 @@ dependencies {
     implementation(libs.kotlin.stdlib)
     implementation(libs.bundles.kotlin.result)
     implementation(project(":annotation"))
-    testImplementation(libs.junit.jupiter)
+
+    testImplementation(libs.bundles.unittest)
 }

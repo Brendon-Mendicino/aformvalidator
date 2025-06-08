@@ -14,7 +14,7 @@ class ParamState<T, E : Any>(
         private set
 
     var value = value
-        private set(newValue) {
+        set(newValue) {
             used = true
             field = newValue
         }
@@ -26,6 +26,16 @@ class ParamState<T, E : Any>(
 
     val isError = used && error != null
 
+    fun update(value: T = this.value): ParamState<T, E> {
+        this.value = value
+
+        return ParamState(
+            value = this.value,
+            conditions = this.conditions,
+            used = this.used,
+        )
+    }
+
     fun copy(
         value: T = this.value,
         conditions: List<(T) -> E?> = this.conditions,
@@ -35,4 +45,8 @@ class ParamState<T, E : Any>(
         conditions = conditions,
         used = used,
     )
+
+    override fun toString(): String {
+        return "ParamState(value=${value}, error=${error}, used=${used})"
+    }
 }

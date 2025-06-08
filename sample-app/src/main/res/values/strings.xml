@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">aformvalidator</string>
+    <string name="the_current_field_should_not_be_empty">The current field should not be empty</string>
 </resources>

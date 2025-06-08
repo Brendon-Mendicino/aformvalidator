@@ -125,11 +125,18 @@ fun $className.toValidator(): $validatorClass {
     fun KSPropertyDeclaration.getValidatorConstructorProperty(): String {
         val propertyName = simpleName.asString()
         val propertyType = type.resolve().getType()!!
-        val errorType = annotations
-            .filterAnnotationsByType(Validator::class)
-            .map { it.getArgumentType(Validator<*>::errorType.name)!! }
-            .map { it.getType()!! }
-            .first()
+        val errorType = try {
+            val errorType = annotations
+                .getHierarchy()
+                .filterAnnotationsByType(Validator::class)
+                .map { it.getArgumentType(Validator<*>::errorType.name)!! }
+                .map { it.getType()!! }
+                .first()
+            errorType
+        } catch (_: Exception) {
+            throw Exception(annotations.getHierarchy().toList().toString())
+//            throw Exception(annotations.map { it.annotationType.resolve().annotations.toList().toString() }.toList().toString())
+        }
 
         return "val $propertyName: ${ParamState::class.qualifiedName!!}<$propertyType, $errorType>"
     }
@@ -138,6 +145,7 @@ fun $className.toValidator(): $validatorClass {
         val errorTypeSequence = this
             .getAllProperties()
             .flatMap { it.annotations }
+            .getHierarchy()
             .filterAnnotationsByType(Validator::class)
             .map { it.getArgumentType(Validator<*>::errorType.name)!! }
             .map { it.getType()!! }
@@ -147,15 +155,17 @@ fun $className.toValidator(): $validatorClass {
 
         errorTypeSequence.forEach {
             if (errorType != it)
-                // TODO: improve this logging message
-                throw Exception("All ${Validator::class.simpleName!!}.${Validator<*>::errorType.name} must have the same type: $errorType, one type was: $it")
+            // TODO: improve this logging message
+                throw Exception("All ${Validator::class.simpleName!!}.${Validator<*>::errorType.name} of class ${this.qualifiedName!!.asString()} must have the same type: $errorType, one type was: $it")
         }
     }
 
     fun KSPropertyDeclaration.getValidatorInstantiationProperty(): String {
         val propertyName = simpleName.asString()
         val propertyType = type.resolve().getType()!!
+        type.resolve().isMarkedNullable
         val errorType = annotations
+            .getHierarchy()
             .filterAnnotationsByType(Validator::class)
             .map { it.getArgumentType(Validator<*>::errorType.name)!! }
             .map { it.getType()!! }
@@ -163,6 +173,7 @@ fun $className.toValidator(): $validatorClass {
 
         // Check that all validators have the same return type
         annotations
+            .getHierarchy()
             .filterAnnotationsByType(Validator::class)
             .map { it.getArgumentType(Validator<*>::errorType.name)!! }
             .forEach {
@@ -171,6 +182,7 @@ fun $className.toValidator(): $validatorClass {
             }
 
         val validatorClasses = annotations
+            .getHierarchy()
             .filterAnnotationsByType(Validator::class)
             .map { it.getArgumentType(Validator<*>::value.name)!! }
             // Get the type
@@ -216,14 +228,20 @@ fun $className.toValidator(): $validatorClass {
 
     }
 
+    fun Sequence<KSAnnotation>.getHierarchy(): Sequence<KSAnnotation> =
+        plus(flatMap {
+            it.annotationType.resolve().declaration.annotations.toList()
+        })
+
     fun KSType.getType(): String? {
         val baseType = declaration.qualifiedName?.asString()
+        val nullable = if (isMarkedNullable) "?" else ""
         val children = arguments.mapNotNull { it.type?.resolve()?.getType() }
 
         return if (children.isEmpty()) {
-            baseType
+            "$baseType$nullable"
         } else {
-            children.joinToString(prefix = "$baseType<", postfix = ">")
+            children.joinToString(prefix = "$baseType<", postfix = ">$nullable")
         }
     }
 }
