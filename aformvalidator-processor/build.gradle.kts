@@ -1,6 +1,7 @@
 plugins {
     id("java-library")
     alias(libs.plugins.jetbrains.kotlin.jvm)
+    alias(libs.plugins.maven.publish)
 }
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -16,7 +17,11 @@ dependencies {
     implementation(libs.ksp)
     implementation(libs.kotlin.stdlib)
     implementation(libs.bundles.kotlin.result)
-    implementation(project(":annotation"))
+    implementation(project(":aformvalidator-annotation"))
 
     testImplementation(libs.bundles.unittest)
+}
+
+mavenPublishing {
+
 }

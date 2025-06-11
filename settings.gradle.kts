@@ -21,5 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "aformvalidator"
 include(":sample-app")
-include(":annotation")
-include(":processor")
+include(":aformvalidator-annotation")
+include(":aformvalidator-processor")

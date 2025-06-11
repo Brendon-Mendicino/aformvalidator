@@ -42,9 +42,9 @@ android {
 
 dependencies {
 
-    implementation(project(":processor"))
-    ksp(project(":processor"))
-    implementation(project(":annotation"))
+    implementation(project(":aformvalidator-processor"))
+    "ksp"(project(":aformvalidator-processor"))
+    implementation(project(":aformvalidator-annotation"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

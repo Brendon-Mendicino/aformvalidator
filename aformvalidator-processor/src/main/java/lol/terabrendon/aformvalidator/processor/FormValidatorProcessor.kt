@@ -51,6 +51,11 @@ class FormValidatorProcessor(
         validatorClassFile.writer().use { writer ->
             val constructorProperties = classDeclaration.getValidatorClassConstructor()
             val toDataConstructorProperties = classDeclaration.getToDataConstructorProperties()
+            val isError = classDeclaration.getValidatorClassIsError()
+            val errors = classDeclaration.getValidatorClassErrors()
+            val oneUsed = classDeclaration.getValidatorClassOneUsed()
+            val allUsed = classDeclaration.getValidatorClassAllUsed()
+
 
             writer.write(
                 """
@@ -59,6 +64,14 @@ package $packageName
 data class $validatorClass(
     $constructorProperties
 ) {
+    $isError
+    
+    $errors
+    
+    $oneUsed
+    
+    $allUsed
+
     fun toData(): $className {
         return $className(
             $toDataConstructorProperties
@@ -104,6 +117,34 @@ fun $className.toValidator(): $validatorClass {
         val propertiesToString = properties.joinToString(postfix = ",")
 
         return propertiesToString
+    }
+
+    fun KSClassDeclaration.getValidatorClassIsError(): String {
+        val propertyNames = getAllProperties().map { it.simpleName.asString() }
+        val isError = propertyNames.map { "$it.error != null" }.joinToString(separator = " || ")
+
+        return "val isError: Boolean = $isError"
+    }
+
+    fun KSClassDeclaration.getValidatorClassErrors(): String {
+        val propertyNames = getAllProperties().map { it.simpleName.asString() }
+        val errors = propertyNames.map { "$it.error" }.joinToString()
+
+        return "val errors = kotlin.sequences.sequenceOf($errors).filterNotNull()"
+    }
+
+    fun KSClassDeclaration.getValidatorClassOneUsed(): String {
+        val propertyNames = getAllProperties().map { it.simpleName.asString() }
+        val oneUsed = propertyNames.map { "$it.used" }.joinToString(separator = " || ")
+
+        return "val oneUsed = $oneUsed"
+    }
+
+    fun KSClassDeclaration.getValidatorClassAllUsed(): String {
+        val propertyNames = getAllProperties().map { it.simpleName.asString() }
+        val allUsed = propertyNames.map { "$it.used" }.joinToString(separator = " && ")
+
+        return "val allUsed = $allUsed"
     }
 
     /**

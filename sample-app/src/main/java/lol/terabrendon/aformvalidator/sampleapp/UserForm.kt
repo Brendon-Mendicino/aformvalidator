@@ -44,10 +44,19 @@ fun UserForm() {
             }
         )
 
-        OutlinedButton(onClick = {
-            println(userState.toData())
-        }) {
+        OutlinedButton(
+            onClick = {
+                println(userState.toData())
+            },
+            enabled = userState.isError.not(),
+        ) {
             Text("Submit")
+        }
+
+        if (userState.allUsed) {
+            userState.errors.firstOrNull()?.let {
+                Text(stringResource(it))
+            }
         }
     }
 }
