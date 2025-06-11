@@ -32,6 +32,7 @@ publishing {
             groupId = project.group.toString()
             artifactId = project.name
             version = project.version.toString()
+            description = project.description
 
             pom {
                 name = project.name
@@ -72,15 +73,15 @@ publishing {
         }
 
         // GitHub Packages
-//        maven {
-//            name = "githubPackages"
-//            url = uri("https://maven.pkg.github.com/Brendon-Mendicino/aformvalidator")
-//            // username and password (a personal Github access token) should be specified as
-//            // `githubPackagesUsername` and `githubPackagesPassword` Gradle properties or alternatively
-//            // as `ORG_GRADLE_PROJECT_githubPackagesUsername` and `ORG_GRADLE_PROJECT_githubPackagesPassword`
-//            // environment variables
-//            credentials(PasswordCredentials::class)
-//        }
+        maven {
+            name = "githubPackages"
+            url = uri("https://maven.pkg.github.com/Brendon-Mendicino/aformvalidator")
+            // username and password (a personal Github access token) should be specified as
+            // `githubPackagesUsername` and `githubPackagesPassword` Gradle properties or alternatively
+            // as `ORG_GRADLE_PROJECT_githubPackagesUsername` and `ORG_GRADLE_PROJECT_githubPackagesPassword`
+            // environment variables
+            credentials(PasswordCredentials::class)
+        }
     }
 }
 
