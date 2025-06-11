@@ -9,6 +9,13 @@ jobs:
   publish:
     name: Release build and publish
     runs-on: macOS-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+      deployments: write
+
     env:
       JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.JRELEASER_MAVENCENTRAL_USERNAME }}
       JRELEASER_MAVENCENTRAL_PASSWORD: ${{ secrets.JRELEASER_MAVENCENTRAL_PASSWORD }}

@@ -30,7 +30,7 @@ dependencies {
 
 publishing {
     publications {
-        create<MavenPublication>("realease") {
+        create<MavenPublication>("maven") {
             from(components["java"])
 
             groupId = project.group.toString()
