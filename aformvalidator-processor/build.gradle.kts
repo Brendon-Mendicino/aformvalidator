@@ -1,9 +1,10 @@
-import com.vanniktech.maven.publish.SonatypeHost
+import org.jreleaser.model.Active
 
 plugins {
     id("java-library")
     alias(libs.plugins.jetbrains.kotlin.jvm)
-    alias(libs.plugins.maven.publish)
+    `maven-publish`
+    alias(libs.plugins.jreleaser)
 }
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -24,59 +25,82 @@ dependencies {
     testImplementation(libs.bundles.unittest)
 }
 
-mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+publishing {
+    publications {
+        create<MavenPublication>("realease") {
+            from(components["java"])
 
-    signAllPublications()
+            groupId = project.group.toString()
+            artifactId = project.name
+            version = project.version.toString()
 
-    coordinates(
-        groupId = project.group.toString(),
-        artifactId = project.name,
-        version = project.version.toString(),
-    )
+            pom {
+                name = project.name
+                description = project.description
+                url = "https://github.com/Brendon-Mendicino/aformvalidator"
 
-    pom {
-        name = project.name
-        description = project.description
-        url = "https://github.com/Brendon-Mendicino/aformvalidator"
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                        distribution = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
 
-        licenses {
-            license {
-                name = "The Apache License, Version 2.0"
-                url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-                distribution = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                developers {
+                    developer {
+                        id = "Brendon-Mendicino"
+                        name = "Brendon Mendicino"
+                        url = "https://github.com/Brendon-Mendicino"
+                        email = "brendonmendicino@yahoo.it"
+                    }
+                }
+
+                scm {
+                    url = "https://github.com/Brendon-Mendicino/aformvalidator"
+                    connection = "scm:git:https://github.com/Brendon-Mendicino/aformvalidator.git"
+                    developerConnection =
+                        "scm:git:ssh://git@github.com/Brendon-Mendicino/aformvalidator.git"
+                }
             }
         }
+    }
 
-        developers {
-            developer {
-                id = "Brendon-Mendicino"
-                name = "Brendon Mendicino"
-                url = "https://github.com/Brendon-Mendicino"
-                email = "brendonmendicino@yahoo.it"
-            }
+    repositories {
+        // Local repository
+        maven {
+            url = uri(layout.buildDirectory.dir("staging-deploy"))
         }
 
-        scm {
-            url = "https://github.com/Brendon-Mendicino/aformvalidator"
-            connection = "scm:git:https://github.com/Brendon-Mendicino/aformvalidator.git"
-            developerConnection =
-                "scm:git:ssh://git@github.com/Brendon-Mendicino/aformvalidator.git"
-        }
+        // GitHub Packages
+//        maven {
+//            name = "githubPackages"
+//            url = uri("https://maven.pkg.github.com/Brendon-Mendicino/aformvalidator")
+//            // username and password (a personal Github access token) should be specified as
+//            // `githubPackagesUsername` and `githubPackagesPassword` Gradle properties or alternatively
+//            // as `ORG_GRADLE_PROJECT_githubPackagesUsername` and `ORG_GRADLE_PROJECT_githubPackagesPassword`
+//            // environment variables
+//            credentials(PasswordCredentials::class)
+//        }
     }
 }
 
-publishing {
-    repositories {
-        // GitHub Packages
+
+jreleaser {
+    gitRootSearch = true
+    signing {
+        active = Active.ALWAYS
+        armored = true
+    }
+    deploy {
         maven {
-            name = "githubPackages"
-            url = uri("https://maven.pkg.github.com/Brendon-Mendicino/aformvalidator")
-            // username and password (a personal Github access token) should be specified as
-            // `githubPackagesUsername` and `githubPackagesPassword` Gradle properties or alternatively
-            // as `ORG_GRADLE_PROJECT_githubPackagesUsername` and `ORG_GRADLE_PROJECT_githubPackagesPassword`
-            // environment variables
-            credentials(PasswordCredentials::class)
+            mavenCentral {
+                create("sonatype") {
+                    active = Active.ALWAYS
+                    url = "https://central.sonatype.com/api/v1/publisher"
+                    stagingRepository("build/staging-deploy")
+                }
+            }
         }
     }
 }

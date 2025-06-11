@@ -15,7 +15,7 @@ junitJupiter = "5.12.2"
 assertk = "0.28.1"
 appcompat = "1.7.1"
 material = "1.12.0"
-mavenPublish = "0.32.0"
+jreleaser = "1.17.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -54,7 +54,7 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
+jreleaser = { id = "org.jreleaser", version.ref = "jreleaser"}
 
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
