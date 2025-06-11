@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "lol.terabrendon.aformvalidator.sampleapp"
+    namespace = "io.github.brendonmendicino.aformvalidator.sampleapp"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "lol.terabrendon.aformvalidator.sampleapp"
+        applicationId = "io.github.brendonmendicino.aformvalidator.sampleapp"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
