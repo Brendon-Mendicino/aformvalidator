@@ -40,8 +40,8 @@ jobs:
         run: |
           ./gradlew jreleaserConfig
           ./gradlew clean
-          ./gradlew publish
-          ./gradlew jreleaserFullRelease
+          ./gradlew publish --continue
+          ./gradlew jreleaserFullRelease --continue
 
   publish-release:
     needs: publish

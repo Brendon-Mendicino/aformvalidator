@@ -14,8 +14,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
-fun UserForm() {
-    var userState by remember { mutableStateOf(UserFormState().toValidator()) }
+fun UserForm(state: UserFormState = UserFormState()) {
+    var userState by remember { mutableStateOf(state.toValidator()) }
 
     LaunchedEffect(userState) {
         println(userState.toString())
@@ -64,5 +64,11 @@ fun UserForm() {
 @Preview(showBackground = true)
 @Composable
 fun UserFormPreview() {
-    UserForm()
+    UserForm(state = UserFormState("test", "world"))
+}
+
+@Preview(showBackground = true)
+@Composable
+fun UserFormErrorsPreview() {
+    UserForm(state = UserFormState("  ", " "))
 }
