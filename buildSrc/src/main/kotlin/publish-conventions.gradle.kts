@@ -55,17 +55,6 @@ publishing {
         maven {
             url = uri(layout.buildDirectory.dir("staging-deploy"))
         }
-
-        // GitHub Packages
-        maven {
-            name = "githubPackages"
-            url = uri("https://maven.pkg.github.com/Brendon-Mendicino/aformvalidator")
-            // username and password (a personal Github access token) should be specified as
-            // `githubPackagesUsername` and `githubPackagesPassword` Gradle properties or alternatively
-            // as `ORG_GRADLE_PROJECT_githubPackagesUsername` and `ORG_GRADLE_PROJECT_githubPackagesPassword`
-            // environment variables
-            credentials(PasswordCredentials::class)
-        }
     }
 }
 
@@ -78,10 +67,27 @@ jreleaser {
     }
     deploy {
         maven {
+            // Maven Central
+            // doc: https://jreleaser.org/guide/latest/reference/deploy/maven/maven-central.html
             mavenCentral {
                 create("sonatype") {
                     active = Active.ALWAYS
+                    applyMavenCentralRules = true
                     url = "https://central.sonatype.com/api/v1/publisher"
+                    stagingRepository("build/staging-deploy")
+
+                    retryDelay = 60
+                    maxRetries = 120
+                }
+            }
+
+            // GitHub Packages
+            // doc: https://jreleaser.org/guide/latest/reference/deploy/maven/github.html
+            github {
+                create("packages") {
+                    active = Active.ALWAYS
+                    applyMavenCentralRules = true
+                    url = "https://maven.pkg.github.com/Brendon-Mendicino/aformvalidator"
                     stagingRepository("build/staging-deploy")
                 }
             }
