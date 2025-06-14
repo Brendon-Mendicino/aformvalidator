@@ -174,8 +174,8 @@ fun $className.toValidator(): $validatorClass {
                 .map { it.getType()!! }
                 .first()
             errorType
-        } catch (_: Exception) {
-            throw Exception(annotations.getHierarchy().toList().toString())
+        } catch (e: Exception) {
+            throw Exception(annotations.getHierarchy().toList().toString(), e)
 //            throw Exception(annotations.map { it.annotationType.resolve().annotations.toList().toString() }.toList().toString())
         }
 
@@ -224,12 +224,8 @@ fun $className.toValidator(): $validatorClass {
 
         val validatorClasses = annotations
             .getHierarchy()
-            .filterAnnotationsByType(Validator::class)
-            .map { it.getArgumentType(Validator<*>::value.name)!! }
-            // Get the type
-            .map { it.getType()!! }
-            // Call the constructor
-            .map { "$it()" }
+            .flatMap { it.getValidatorAndParent() }
+            .map { (validator, parent) -> getValidatorConstructor(validator, parent) }
 
         return """
         $propertyName = ${ParamState::class.qualifiedName!!}<$propertyType, $errorType>(
@@ -244,21 +240,6 @@ fun $className.toValidator(): $validatorClass {
         """.trimIndent()
     }
 
-    @OptIn(KspExperimental::class)
-    fun KSPropertyDeclaration.getPropertyDependencies(): List<String> {
-        val validatorAnnotations = getAnnotationsByType(Validator::class)
-        val errorType = validatorAnnotations.map { it.errorType }.first()
-
-        return setOf<String>(
-            type.containingFile?.packageName?.toString()!!,
-            errorType.qualifiedName!!,
-            ParamState::class.qualifiedName!!,
-            ValidatorCond::class.qualifiedName!!,
-        ).plus(
-            validatorAnnotations.map { it.value.qualifiedName!! },
-        ).toList()
-    }
-
     fun <T : Annotation> Sequence<KSAnnotation>.filterAnnotationsByType(annotation: KClass<T>) =
         filter { it.annotationType.resolve().declaration.qualifiedName?.asString() == annotation.qualifiedName }
 
@@ -266,13 +247,49 @@ fun $className.toValidator(): $validatorClass {
         val argument = arguments.firstOrNull { it.name?.asString() == argName }
 
         return argument?.value as? KSType
+    }
 
+    fun KSAnnotation.getValidatorAndParent(): Sequence<Pair<KSAnnotation, KSAnnotation>> =
+        annotationType
+            .resolve()
+            .declaration
+            .annotations
+            .filterAnnotationsByType(Validator::class)
+            .map { Pair(it, this) }
+
+    fun getValidatorConstructor(validator: KSAnnotation, parent: KSAnnotation): String {
+        val validatorType = validator.getArgumentType(Validator<*>::value.name)!!
+        val validatorParameters =
+            (validatorType.declaration as KSClassDeclaration).primaryConstructor!!.parameters.map { it.name!!.asString() }
+
+        val parentParameterValues = parent.arguments.associateBy { it.name!!.asString() }
+
+        val constructorParameters =
+            validatorParameters.joinToString { "$it = ${parentParameterValues[it]!!.value.toString()}" }
+
+        return "${validatorType.getType()!!}($constructorParameters)"
     }
 
     fun Sequence<KSAnnotation>.getHierarchy(): Sequence<KSAnnotation> =
-        plus(flatMap {
-            it.annotationType.resolve().declaration.annotations.toList()
-        })
+        flatMap { it.getHierarchy() }
+
+    fun buildHierarchy(annotation: KSAnnotation, seenAnnotations: Set<String>): List<KSAnnotation> {
+        val seenAnnotations = seenAnnotations.toMutableSet()
+
+        seenAnnotations.add(annotation.shortName.asString())
+
+        return annotation
+            .annotationType
+            .resolve()
+            .declaration
+            .annotations
+            .filter { it.shortName.asString() !in seenAnnotations }
+            .toList()
+            .flatMap { buildHierarchy(it, seenAnnotations) }
+            .plus(annotation)
+    }
+
+    fun KSAnnotation.getHierarchy(): List<KSAnnotation> = buildHierarchy(this, setOf())
 
     fun KSType.getType(): String? {
         val baseType = declaration.qualifiedName?.asString()

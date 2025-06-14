@@ -29,7 +29,7 @@ fun UserForm(state: UserFormState = UserFormState()) {
             isError = userState.name.isError,
             supportingText = {
                 if (userState.name.isError)
-                    Text(stringResource(userState.name.error!!))
+                    Text(stringResource(userState.name.error!!.asRes()))
             }
         )
 
@@ -40,7 +40,7 @@ fun UserForm(state: UserFormState = UserFormState()) {
             isError = userState.surname.isError,
             supportingText = {
                 if (userState.surname.isError)
-                    Text(stringResource(userState.surname.error!!))
+                    Text(stringResource(userState.surname.error!!.asRes()))
             }
         )
 
@@ -55,7 +55,7 @@ fun UserForm(state: UserFormState = UserFormState()) {
 
         if (userState.allUsed) {
             userState.errors.firstOrNull()?.let {
-                Text(stringResource(it))
+                Text(stringResource(it.asRes()))
             }
         }
     }
@@ -64,11 +64,11 @@ fun UserForm(state: UserFormState = UserFormState()) {
 @Preview(showBackground = true)
 @Composable
 fun UserFormPreview() {
-    UserForm(state = UserFormState("test", "world"))
+    UserForm(state = UserFormState(name = "test", surname = "world", ))
 }
 
 @Preview(showBackground = true)
 @Composable
 fun UserFormErrorsPreview() {
-    UserForm(state = UserFormState("  ", " "))
+    UserForm(state = UserFormState(name = "  ", surname = " "))
 }
