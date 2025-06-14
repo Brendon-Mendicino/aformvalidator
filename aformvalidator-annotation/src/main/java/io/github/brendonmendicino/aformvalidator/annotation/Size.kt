@@ -6,6 +6,7 @@ package io.github.brendonmendicino.aformvalidator.annotation
 )
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.ANNOTATION_CLASS)
 @Retention(AnnotationRetention.SOURCE)
+@Repeatable
 @MustBeDocumented
 annotation class Size(
     val min: Int = 0,

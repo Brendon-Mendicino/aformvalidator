@@ -1,19 +1,25 @@
 package io.github.brendonmendicino.aformvalidator.sampleapp
 
 import androidx.annotation.StringRes
+import io.github.brendonmendicino.aformvalidator.annotation.Email
 import io.github.brendonmendicino.aformvalidator.annotation.FormState
 import io.github.brendonmendicino.aformvalidator.annotation.NotBlank
+import io.github.brendonmendicino.aformvalidator.annotation.Pattern
 import io.github.brendonmendicino.aformvalidator.annotation.Size
 import io.github.brendonmendicino.aformvalidator.annotation.ValidationError
 
 @FormState
 data class UserFormState(
-    @Size(min = 5)
-    val list: List<Int> = emptyList(),
     @NotBlank
     val name: String? = "",
     @NotBlank
     val surname: String? = "",
+    @Email
+    val email: String? = "",
+    @Pattern("hello")
+    val test: String? = "",
+    @Size(min = 1)
+    val list: List<Int> = emptyList(),
 )
 
 @StringRes

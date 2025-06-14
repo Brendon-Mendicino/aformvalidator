@@ -64,7 +64,15 @@ fun UserForm(state: UserFormState = UserFormState()) {
 @Preview(showBackground = true)
 @Composable
 fun UserFormPreview() {
-    UserForm(state = UserFormState(name = "test", surname = "world", ))
+    UserForm(
+        state = UserFormState(
+            name = "test",
+            surname = "world",
+            email = "bre@bre.it",
+            test = "hello",
+            list = listOf(1)
+        )
+    )
 }
 
 @Preview(showBackground = true)

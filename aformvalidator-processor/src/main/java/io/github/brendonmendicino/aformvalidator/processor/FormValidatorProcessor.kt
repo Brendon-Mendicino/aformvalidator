@@ -222,6 +222,10 @@ fun $className.toValidator(): $validatorClass {
                     throw Exception("Ma io che cazzo ne so scusa")
             }
 
+        // Now the validator constructor is called with arguments,
+        // this is obtained by taking validator annotation and it's
+        // parent, and calling the validator arguments with the
+        // parent annotation values.
         val validatorClasses = annotations
             .getHierarchy()
             .flatMap { it.getValidatorAndParent() }
@@ -264,8 +268,13 @@ fun $className.toValidator(): $validatorClass {
 
         val parentParameterValues = parent.arguments.associateBy { it.name!!.asString() }
 
+        fun Any?.toParam(): String = when (this) {
+            is String -> "\"\"\"${this.replace("$", "\${'$'}")}\"\"\""
+            else -> this.toString()
+        }
+
         val constructorParameters =
-            validatorParameters.joinToString { "$it = ${parentParameterValues[it]!!.value.toString()}" }
+            validatorParameters.joinToString { "$it = ${parentParameterValues[it]!!.value.toParam()}" }
 
         return "${validatorType.getType()!!}($constructorParameters)"
     }
