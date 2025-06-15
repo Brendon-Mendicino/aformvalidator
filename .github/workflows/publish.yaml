@@ -41,7 +41,7 @@ jobs:
           ./gradlew jreleaserConfig
           ./gradlew clean
           ./gradlew publish
-          ./gradlew jreleaserFullRelease --full-stacktrace --continue
+          ./gradlew jreleaserDeploy --full-stacktrace --continue
 
   publish-release:
     needs: publish

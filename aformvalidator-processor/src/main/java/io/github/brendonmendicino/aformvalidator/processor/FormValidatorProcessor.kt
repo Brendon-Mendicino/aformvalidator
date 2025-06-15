@@ -189,6 +189,9 @@ fun $className.toValidator(): $validatorClass {
             .map { it.getType()!! }
             .iterator()
 
+        if (!errorTypeSequence.hasNext())
+            return
+
         val errorType = errorTypeSequence.next()
 
         errorTypeSequence.forEach {
