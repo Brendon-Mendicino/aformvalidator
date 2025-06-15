@@ -65,6 +65,15 @@ jreleaser {
         active = Active.ALWAYS
         armored = true
     }
+    release {
+        github {
+            repoOwner = "Brendon-Mendicino"
+            name = rootProject.name
+            update {
+                enabled = true
+            }
+        }
+    }
     deploy {
         maven {
             // Maven Central
