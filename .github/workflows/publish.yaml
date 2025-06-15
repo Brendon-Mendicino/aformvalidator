@@ -39,8 +39,8 @@ jobs:
         run: |
           ./gradlew jreleaserConfig
           ./gradlew clean
-          ./gradlew publish --info --continue
-          ./gradlew jreleaserFullRelease --info --continue
+          ./gradlew publish
+          ./gradlew jreleaserFullRelease --full-stacktrace --continue
 
   publish-release:
     needs: publish
