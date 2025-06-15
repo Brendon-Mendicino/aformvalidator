@@ -5,48 +5,21 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.getErrorOr
 import com.github.michaelbull.result.mapResult
 
-class ParamState<T, E : Any>(
-    value: T,
-    val conditions: List<(T) -> E?> = emptyList(),
-    used: Boolean = false,
+public data class ParamState<T, out E : Any>(
+    public val value: T,
+    public val conditions: List<(T) -> E?> = emptyList(),
+    public val used: Boolean = false,
 ) {
-    var used = used
-        private set
-
-    var value = value
-        set(newValue) {
-            used = true
-            field = newValue
-        }
-
-    val error: E?
+    public val error: E?
         get() = conditions
             .mapResult { condition -> condition(value)?.let { Err(it) } ?: Ok(Unit) }
             .getErrorOr(null)
 
-    val isError = used && error != null
+    public val isError: Boolean = used && error != null
 
-    fun update(value: T = this.value): ParamState<T, E> {
-        this.value = value
-
-        return ParamState(
-            value = this.value,
-            conditions = this.conditions,
-            used = this.used,
-        )
-    }
-
-    fun copy(
-        value: T = this.value,
-        conditions: List<(T) -> E?> = this.conditions,
-        used: Boolean = this.used
-    ): ParamState<T, E> = ParamState(
+    public fun update(value: T = this.value): ParamState<T, E> = ParamState(
         value = value,
-        conditions = conditions,
-        used = used,
+        conditions = this.conditions,
+        used = true,
     )
-
-    override fun toString(): String {
-        return "ParamState(value=${value}, error=${error}, used=${used})"
-    }
 }

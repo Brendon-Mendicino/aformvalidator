@@ -1,7 +1,7 @@
 package io.github.brendonmendicino.aformvalidator.annotation
 
-sealed class ValidationError {
-    object NotBlank: ValidationError()
-    object Size: ValidationError()
-    object Pattern: ValidationError()
+public sealed class ValidationError {
+    public object NotBlank: ValidationError()
+    public object Size: ValidationError()
+    public object Pattern: ValidationError()
 }

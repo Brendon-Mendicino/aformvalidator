@@ -35,12 +35,24 @@ fun UserForm(state: UserFormState = UserFormState()) {
 
         OutlinedTextField(
             userState.surname.value ?: "",
-            label = { Text("Surname") },
+            label = { Text("Email") },
             onValueChange = { userState = userState.copy(surname = userState.surname.update(it)) },
             isError = userState.surname.isError,
             supportingText = {
                 if (userState.surname.isError)
                     Text(stringResource(userState.surname.error!!.asRes()))
+            }
+        )
+
+        OutlinedTextField(
+            userState.email.value ?: "",
+            label = { Text("Surname") },
+            onValueChange = { userState = userState.copy(email = userState.email.update(it)) },
+            isError = userState.email.isError,
+            supportingText = {
+                if (userState.email.isError) {
+                    Text(stringResource(userState.email.error!!.asRes()))
+                }
             }
         )
 

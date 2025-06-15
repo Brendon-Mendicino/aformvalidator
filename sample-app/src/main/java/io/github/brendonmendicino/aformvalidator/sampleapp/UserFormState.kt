@@ -12,7 +12,6 @@ import io.github.brendonmendicino.aformvalidator.annotation.ValidationError
 data class UserFormState(
     @NotBlank
     val name: String? = "",
-    @NotBlank
     val surname: String? = "",
     @Email
     val email: String? = "",
@@ -25,5 +24,5 @@ data class UserFormState(
 @StringRes
 fun ValidationError.asRes(): Int = when (this) {
     is ValidationError.NotBlank -> R.string.the_current_field_should_not_be_empty
-    else -> throw Exception()
+    else -> R.string.app_name
 }

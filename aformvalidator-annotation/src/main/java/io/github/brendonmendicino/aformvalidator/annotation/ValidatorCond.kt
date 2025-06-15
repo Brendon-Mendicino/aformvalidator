@@ -1,5 +1,5 @@
 package io.github.brendonmendicino.aformvalidator.annotation
 
-interface ValidatorCond<in T, out E : Any> {
-    val conditions: List<(T) -> E?>
+public interface ValidatorCond<in T, out E : Any> {
+    public val conditions: List<(T) -> E?>
 }

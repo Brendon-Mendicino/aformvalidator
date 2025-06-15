@@ -1,8 +1,5 @@
 package io.github.brendonmendicino.aformvalidator.processor
 
-import com.google.devtools.ksp.KspExperimental
-import com.google.devtools.ksp.containingFile
-import com.google.devtools.ksp.getAnnotationsByType
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.Resolver
@@ -59,6 +56,8 @@ class FormValidatorProcessor(
 
             writer.write(
                 """
+@file:Suppress("warnings")
+
 package $packageName
     
 data class $validatorClass(
@@ -95,6 +94,8 @@ data class $validatorClass(
 
             writer.write(
                 """
+@file:Suppress("warnings")
+
 package $packageName
 
 fun $className.toValidator(): $validatorClass {
@@ -166,18 +167,14 @@ fun $className.toValidator(): $validatorClass {
     fun KSPropertyDeclaration.getValidatorConstructorProperty(): String {
         val propertyName = simpleName.asString()
         val propertyType = type.resolve().getType()!!
-        val errorType = try {
-            val errorType = annotations
-                .getHierarchy()
-                .filterAnnotationsByType(Validator::class)
-                .map { it.getArgumentType(Validator<*>::errorType.name)!! }
-                .map { it.getType()!! }
-                .first()
-            errorType
-        } catch (e: Exception) {
-            throw Exception(annotations.getHierarchy().toList().toString(), e)
-//            throw Exception(annotations.map { it.annotationType.resolve().annotations.toList().toString() }.toList().toString())
-        }
+        val errorType = annotations
+            .getHierarchy()
+            .filterAnnotationsByType(Validator::class)
+            .map { it.getArgumentType(Validator<*>::errorType.name)!! }
+            .map { it.getType()!! }
+            // If there is no errorType the field has not been annotated.
+            .firstOrNull()
+            ?: "Nothing"
 
         return "val $propertyName: ${ParamState::class.qualifiedName!!}<$propertyType, $errorType>"
     }
@@ -210,7 +207,8 @@ fun $className.toValidator(): $validatorClass {
             .filterAnnotationsByType(Validator::class)
             .map { it.getArgumentType(Validator<*>::errorType.name)!! }
             .map { it.getType()!! }
-            .first()
+            .firstOrNull()
+            ?: "Nothing"
 
         // Check that all validators have the same return type
         annotations

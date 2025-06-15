@@ -8,11 +8,11 @@ package io.github.brendonmendicino.aformvalidator.annotation
 @Retention(AnnotationRetention.BINARY)
 @Repeatable
 @MustBeDocumented
-annotation class Pattern(
-    val regex: String = ""
+public annotation class Pattern(
+    public val regex: String = ""
 ) {
-    companion object {
-        class Validator(val regex: String) : ValidatorCond<String?, ValidationError> {
+    public companion object {
+        public class Validator(public val regex: String) : ValidatorCond<String?, ValidationError> {
             override val conditions: List<(String?) -> ValidationError?> = listOf {
                 val toMatch = regex.toRegex()
 

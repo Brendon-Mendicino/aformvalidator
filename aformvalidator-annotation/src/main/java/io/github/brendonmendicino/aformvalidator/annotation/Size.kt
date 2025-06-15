@@ -8,14 +8,14 @@ package io.github.brendonmendicino.aformvalidator.annotation
 @Retention(AnnotationRetention.SOURCE)
 @Repeatable
 @MustBeDocumented
-annotation class Size(
+public annotation class Size(
     val min: Int = 0,
     val max: Int = Int.MAX_VALUE,
 ) {
-    companion object {
-        class Validator(
-            val min: Int,
-            val max: Int,
+    public companion object {
+        public class Validator(
+            public val min: Int,
+            public val max: Int,
         ) : ValidatorCond<Collection<*>, ValidationError> {
             override val conditions: List<(Collection<*>) -> ValidationError?> = listOf {
                 if (min <= it.size && it.size <= max) null

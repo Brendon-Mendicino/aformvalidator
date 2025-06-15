@@ -7,15 +7,14 @@ package io.github.brendonmendicino.aformvalidator.annotation
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.ANNOTATION_CLASS)
 @Retention(AnnotationRetention.SOURCE)
 @MustBeDocumented
-annotation class NotBlank {
+public annotation class NotBlank {
 
-    companion object {
-        class Validator : ValidatorCond<String?, ValidationError> {
+    public companion object {
+        public class Validator : ValidatorCond<String?, ValidationError> {
             override val conditions: List<(String?) -> ValidationError?> = listOf { str ->
                 if (str?.trim()?.isEmpty() != false) ValidationError.NotBlank
                 else null
             }
-
         }
     }
 }
