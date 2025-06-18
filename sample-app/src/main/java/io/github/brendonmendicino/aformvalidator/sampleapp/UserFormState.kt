@@ -7,6 +7,7 @@ import io.github.brendonmendicino.aformvalidator.annotation.Min
 import io.github.brendonmendicino.aformvalidator.annotation.NotBlank
 import io.github.brendonmendicino.aformvalidator.annotation.Pattern
 import io.github.brendonmendicino.aformvalidator.annotation.Size
+import io.github.brendonmendicino.aformvalidator.annotation.ToNumber
 import io.github.brendonmendicino.aformvalidator.annotation.ValidationError
 
 @FormState
@@ -22,6 +23,8 @@ data class UserFormState(
     val list: List<Int> = emptyList(),
     @Min(7)
     val randomNumber: Int = 42,
+    @ToNumber(Int::class)
+    val num: String = ""
 )
 
 @StringRes

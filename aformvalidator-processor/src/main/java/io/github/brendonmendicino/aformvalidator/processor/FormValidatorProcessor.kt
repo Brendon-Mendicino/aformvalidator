@@ -272,6 +272,7 @@ fun $className.toValidator(): $validatorClass {
 
         fun Any?.toParam(): String = when (this) {
             is String -> "\"\"\"${this.replace("$", "\${'$'}")}\"\"\""
+            is KSType -> "${this.declaration.qualifiedName!!.asString()}::class"
             else -> this.toString()
         }
 
