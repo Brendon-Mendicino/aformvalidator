@@ -16,8 +16,10 @@ public annotation class Max(
 ) {
     public companion object {
         public class Validator(public val max: Long) :
-            ValidatorCond<Number, ValidationError> {
-            override val conditions: List<(Number) -> ValidationError?> = listOf {
+            ValidatorCond<Number?, ValidationError> {
+            override val conditions: List<(Number?) -> ValidationError?> = listOf {
+                it ?: return@listOf null
+
                 if (it.toLong() > max) ValidationError.Min(min = max)
                 else null
             }

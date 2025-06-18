@@ -16,8 +16,10 @@ public annotation class MaxDouble(
 ) {
     public companion object {
         public class Validator(public val max: Double) :
-            ValidatorCond<Number, ValidationError> {
-            override val conditions: List<(Number) -> ValidationError?> = listOf {
+            ValidatorCond<Number?, ValidationError> {
+            override val conditions: List<(Number?) -> ValidationError?> = listOf {
+                it ?: return@listOf null
+
                 if (it.toDouble() > max) ValidationError.MaxDouble(max = max)
                 else null
             }

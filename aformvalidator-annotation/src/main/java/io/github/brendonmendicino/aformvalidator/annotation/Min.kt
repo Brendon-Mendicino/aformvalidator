@@ -17,9 +17,10 @@ public annotation class Min(
 ) {
     public companion object {
         public class Validator(public val min: Long) :
-            ValidatorCond<Number, ValidationError> {
-            override val conditions: List<(Number) -> ValidationError?> = listOf {
-                Long
+            ValidatorCond<Number?, ValidationError> {
+            override val conditions: List<(Number?) -> ValidationError?> = listOf {
+                it ?: return@listOf null
+
                 if (it.toLong() < min) ValidationError.Min(min = min.toLong())
                 else null
             }

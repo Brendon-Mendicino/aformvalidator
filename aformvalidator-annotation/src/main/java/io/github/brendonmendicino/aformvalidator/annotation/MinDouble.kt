@@ -16,8 +16,10 @@ public annotation class MinDouble(
 ) {
     public companion object {
         public class Validator(public val min: Double) :
-            ValidatorCond<Number, ValidationError> {
-            override val conditions: List<(Number) -> ValidationError?> = listOf {
+            ValidatorCond<Number?, ValidationError> {
+            override val conditions: List<(Number?) -> ValidationError?> = listOf {
+                it ?: return@listOf null
+
                 if (it.toDouble() < min) ValidationError.MinDouble(min = min)
                 else null
             }
