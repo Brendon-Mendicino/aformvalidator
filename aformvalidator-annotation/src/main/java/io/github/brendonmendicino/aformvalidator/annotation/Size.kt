@@ -1,5 +1,8 @@
 package io.github.brendonmendicino.aformvalidator.annotation
 
+/**
+ * Validate a [Collection] size with upper and lower bounds.
+ */
 @Validator<ValidationError>(
     value = Size.Companion.Validator::class,
     errorType = ValidationError::class,
@@ -19,7 +22,7 @@ public annotation class Size(
         ) : ValidatorCond<Collection<*>, ValidationError> {
             override val conditions: List<(Collection<*>) -> ValidationError?> = listOf {
                 if (min <= it.size && it.size <= max) null
-                else ValidationError.Size
+                else ValidationError.Size(min = min, max = max)
             }
         }
     }

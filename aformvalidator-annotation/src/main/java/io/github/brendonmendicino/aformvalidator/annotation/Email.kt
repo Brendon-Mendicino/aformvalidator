@@ -5,11 +5,24 @@ package io.github.brendonmendicino.aformvalidator.annotation
  *
  * Regex reference: [ref](https://www.regular-expressions.info/email.html)
  */
-@Pattern(
-    regex = """\A[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\z"""
+@Validator<ValidationError>(
+    value = Email.Companion.Validator::class,
+    errorType = ValidationError::class,
 )
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.ANNOTATION_CLASS)
 @Retention(AnnotationRetention.SOURCE)
-@Repeatable
 @MustBeDocumented
-public annotation class Email()
+public annotation class Email(
+    val pattern: String = """\A[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\z"""
+) {
+    public companion object {
+        public class Validator(pattern: String): ValidatorCond<String?, ValidationError> {
+            override val conditions: List<(String?) -> ValidationError?> = listOf {
+                val toMatch = pattern.toRegex()
+
+                if (it == null || !toMatch.matches(it)) ValidationError.Email
+                else null
+            }
+        }
+    }
+}

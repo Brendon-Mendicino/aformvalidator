@@ -1,11 +1,14 @@
 package io.github.brendonmendicino.aformvalidator.annotation
 
+/**
+ * Validate a [String] against a [regex] pattern.
+ */
 @Validator<ValidationError>(
     value = Pattern.Companion.Validator::class,
     errorType = ValidationError::class,
 )
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.ANNOTATION_CLASS)
-@Retention(AnnotationRetention.BINARY)
+@Retention(AnnotationRetention.SOURCE)
 @Repeatable
 @MustBeDocumented
 public annotation class Pattern(
@@ -16,7 +19,7 @@ public annotation class Pattern(
             override val conditions: List<(String?) -> ValidationError?> = listOf {
                 val toMatch = regex.toRegex()
 
-                if (it == null || !toMatch.matches(it)) ValidationError.Pattern
+                if (it == null || !toMatch.matches(it)) ValidationError.Pattern(regex = regex)
                 else null
             }
         }

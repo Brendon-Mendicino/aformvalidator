@@ -39,6 +39,7 @@ class FormValidatorProcessor(
         val validatorClass = "${className}Validator"
         val extensionClass = "${className}Extension"
 
+        // TODO: Consider using KotlinPoet instead of these crappy strings
         val validatorClassFile = codeGenerator.createNewFile(
             dependencies = Dependencies(true, classDeclaration.containingFile!!),
             packageName = packageName,

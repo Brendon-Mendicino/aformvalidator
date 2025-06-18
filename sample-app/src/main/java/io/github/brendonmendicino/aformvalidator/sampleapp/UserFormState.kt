@@ -3,6 +3,7 @@ package io.github.brendonmendicino.aformvalidator.sampleapp
 import androidx.annotation.StringRes
 import io.github.brendonmendicino.aformvalidator.annotation.Email
 import io.github.brendonmendicino.aformvalidator.annotation.FormState
+import io.github.brendonmendicino.aformvalidator.annotation.Min
 import io.github.brendonmendicino.aformvalidator.annotation.NotBlank
 import io.github.brendonmendicino.aformvalidator.annotation.Pattern
 import io.github.brendonmendicino.aformvalidator.annotation.Size
@@ -19,6 +20,8 @@ data class UserFormState(
     val test: String? = "",
     @Size(min = 1)
     val list: List<Int> = emptyList(),
+    @Min(7)
+    val randomNumber: Int = 42,
 )
 
 @StringRes

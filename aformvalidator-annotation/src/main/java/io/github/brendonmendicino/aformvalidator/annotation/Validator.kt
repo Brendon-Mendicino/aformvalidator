@@ -2,6 +2,11 @@ package io.github.brendonmendicino.aformvalidator.annotation
 
 import kotlin.reflect.KClass
 
+/**
+ * [Validator] is the base annotation to perform validations of a [ParamState].
+ *
+ * All the base annotations of the library extend from this one.
+ */
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.ANNOTATION_CLASS)
 @Retention(AnnotationRetention.BINARY)
 @MustBeDocumented
