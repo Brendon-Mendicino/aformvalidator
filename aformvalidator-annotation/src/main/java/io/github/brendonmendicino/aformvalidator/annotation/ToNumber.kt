@@ -21,6 +21,7 @@ public annotation class ToNumber(
             ValidatorCond<String?, ValidationError> {
             override val conditions: List<(String?) -> ValidationError?> = listOf {
                 it ?: return@listOf null
+                if (it == "") return@listOf null
 
                 if (numberClass.toNumberOrNull(it) == null) ValidationError.ToNumber(numberClass = numberClass)
                 else null
