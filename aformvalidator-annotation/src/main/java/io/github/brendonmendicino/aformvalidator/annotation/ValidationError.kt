@@ -12,4 +12,5 @@ public sealed class ValidationError {
     public data class MinDouble(val min: Double) : ValidationError()
     public data class MaxDouble(val max: Double) : ValidationError()
     public data class ToNumber(val numberClass: KClass<out Number>) : ValidationError()
+    public object NotNull : ValidationError()
 }
