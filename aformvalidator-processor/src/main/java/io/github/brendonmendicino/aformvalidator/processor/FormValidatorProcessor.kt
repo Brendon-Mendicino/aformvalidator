@@ -150,9 +150,11 @@ fun $className.toValidator(): $validatorClass {
 
     fun KSClassDeclaration.getValidatorClassErrors(): String {
         val propertyNames = getAllProperties().map { it.simpleName.asString() }
-        val errors = propertyNames.map { "$it.error" }.joinToString()
+        val errors = propertyNames.map { "$it.error" }
+        val pairs = propertyNames.zip(errors).map { (name, error) -> "Pair(this::$name, $error)" }
+            .joinToString()
 
-        return "val errors = kotlin.sequences.sequenceOf($errors).filterNotNull()"
+        return "val errors = kotlin.sequences.sequenceOf($pairs).mapNotNull { (name, error) -> error?.let { Pair(name, error) } }"
     }
 
     fun KSClassDeclaration.getValidatorClassOneUsed(): String {

@@ -66,8 +66,8 @@ fun UserForm(state: UserFormState = UserFormState()) {
         }
 
         if (userState.allUsed) {
-            userState.errors.firstOrNull()?.let {
-                Text(stringResource(it.asRes()))
+            userState.errors.firstOrNull()?.let { (_, error) ->
+                Text(stringResource(error.asRes()))
             }
         }
     }
