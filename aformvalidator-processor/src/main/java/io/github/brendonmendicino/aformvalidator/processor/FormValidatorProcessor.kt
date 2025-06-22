@@ -48,6 +48,7 @@ class FormValidatorProcessor(
 
         validatorClassFile.writer().use { writer ->
             val constructorProperties = classDeclaration.getValidatorClassConstructor()
+            val derivedProperties = classDeclaration.getValidatorDerivedProperties()
             val toDataConstructorProperties = classDeclaration.getToDataConstructorProperties()
             val isError = classDeclaration.getValidatorClassIsError()
             val errors = classDeclaration.getValidatorClassErrors()
@@ -64,6 +65,8 @@ package $packageName
 data class $validatorClass(
     $constructorProperties
 ) {
+    $derivedProperties
+
     $isError
     
     $errors
@@ -90,8 +93,12 @@ data class $validatorClass(
 
         extensionFile.writer().use { writer ->
             classDeclaration.checkAllAnnotationErrorType()
-            val properties =
-                classDeclaration.getAllProperties().map { it.getValidatorInstantiationProperty() }
+            val constructorParameters =
+                classDeclaration.getConstructorParameterNames()?.toSet() ?: emptySet()
+            val properties = classDeclaration
+                .getAllProperties()
+                .filter { it.simpleName.asString() in constructorParameters }
+                .map { it.getValidatorInstantiationProperty() }
 
             writer.write(
                 """
@@ -113,12 +120,25 @@ fun $className.toValidator(): $validatorClass {
      * Get the Validator class properties when calling the constructor.
      */
     fun KSClassDeclaration.getValidatorClassConstructor(): String {
-        val properties =
-            this.getAllProperties().map { it.getValidatorConstructorProperty() }
+        val constructorParameters = getConstructorParameterNames()?.toSet() ?: emptySet()
+        val properties = this
+            .getAllProperties()
+            .filter { it.simpleName.asString() in constructorParameters }
+            .map { it.getValidatorConstructorProperty() }
 
         val propertiesToString = properties.joinToString(postfix = ",")
 
         return propertiesToString
+    }
+
+    fun KSClassDeclaration.getValidatorDerivedProperties(): String {
+        val constructorParameters = getConstructorParameterNames()?.toSet() ?: emptySet()
+        val derivedProperties = this
+            .getAllProperties()
+            .filter { it.simpleName.asString() !in constructorParameters }
+            .map { it.getDerivedPropertyDeclaration() }
+
+        return derivedProperties.joinToString(separator = "\n    ")
     }
 
     fun KSClassDeclaration.getValidatorClassIsError(): String {
@@ -156,8 +176,11 @@ fun $className.toValidator(): $validatorClass {
      * The `.value` attribute comes from the [ParamState]
      */
     fun KSClassDeclaration.getToDataConstructorProperties(): String {
-        val propertyNames =
-            this.getAllProperties().map { it.simpleName.asString() }
+        val constructorParameters = getConstructorParameterNames()?.toSet() ?: emptySet()
+        val propertyNames = this
+            .getAllProperties()
+            .filter { it.simpleName.asString() in constructorParameters }
+            .map { it.simpleName.asString() }
 
         val toDataPropertyAssignments =
             propertyNames.map { "$it = this.$it.value" }.joinToString(postfix = ",")
@@ -204,6 +227,19 @@ fun $className.toValidator(): $validatorClass {
 
     fun KSPropertyDeclaration.getValidatorInstantiationProperty(): String {
         val propertyName = simpleName.asString()
+
+        return "$propertyName = ${getParamStateInstantiation(paramStateValue = "this.$propertyName")}"
+    }
+
+    fun KSPropertyDeclaration.getDerivedPropertyDeclaration(): String {
+        val propertyName = simpleName.asString()
+        val propertyType = getValidatorConstructorProperty()
+        val paramStateInstantiation = getParamStateInstantiation("this.toData().$propertyName")
+
+        return "$propertyType = $paramStateInstantiation"
+    }
+
+    fun KSPropertyDeclaration.getParamStateInstantiation(paramStateValue: String): String {
         val propertyType = type.resolve().getType()!!
         type.resolve().isMarkedNullable
         val errorType = annotations
@@ -234,8 +270,8 @@ fun $className.toValidator(): $validatorClass {
             .map { (validator, parent) -> getValidatorConstructor(validator, parent) }
 
         return """
-        $propertyName = ${ParamState::class.qualifiedName!!}<$propertyType, $errorType>(
-            value = this.$propertyName,
+        ${ParamState::class.qualifiedName!!}<$propertyType, $errorType>(
+            value = $paramStateValue,
             conditions = 
                 // List of validator classes
                 listOf<${ValidatorCond::class.qualifiedName!!}<$propertyType, $errorType>>(
@@ -262,6 +298,9 @@ fun $className.toValidator(): $validatorClass {
             .annotations
             .filterAnnotationsByType(Validator::class)
             .map { Pair(it, this) }
+
+    fun KSClassDeclaration.getConstructorParameterNames() =
+        primaryConstructor?.parameters?.mapNotNull { it.name?.asString() }
 
     fun getValidatorConstructor(validator: KSAnnotation, parent: KSAnnotation): String {
         val validatorType = validator.getArgumentType(Validator<*>::value.name)!!

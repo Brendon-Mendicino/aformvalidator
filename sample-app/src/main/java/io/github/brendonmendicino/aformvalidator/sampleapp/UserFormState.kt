@@ -25,7 +25,10 @@ data class UserFormState(
     val randomNumber: Int = 42,
     @ToNumber(Int::class)
     val num: String = ""
-)
+) {
+    @Min(3)
+    val derived: Int? = num.toIntOrNull()
+}
 
 @StringRes
 fun ValidationError.asRes(): Int = when (this) {
