@@ -2,6 +2,7 @@ package io.github.brendonmendicino.aformvalidator.processor
 
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
+import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.ClassKind
@@ -10,6 +11,7 @@ import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSType
+import io.github.brendonmendicino.aformvalidator.annotation.DependsOn
 import io.github.brendonmendicino.aformvalidator.annotation.FormState
 import io.github.brendonmendicino.aformvalidator.annotation.ParamState
 import io.github.brendonmendicino.aformvalidator.annotation.Validator
@@ -18,6 +20,7 @@ import kotlin.reflect.KClass
 
 class FormValidatorProcessor(
     private val codeGenerator: CodeGenerator,
+    private val logger: KSPLogger,
 ) : SymbolProcessor {
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
@@ -221,9 +224,13 @@ fun $className.toValidator(): $validatorClass {
         val errorType = errorTypeSequence.next()
 
         errorTypeSequence.forEach {
-            if (errorType != it)
-            // TODO: improve this logging message
-                throw Exception("All ${Validator::class.simpleName!!}.${Validator<*>::errorType.name} of class ${this.qualifiedName!!.asString()} must have the same type: $errorType, one type was: $it")
+            if (errorType != it) {
+                // TODO: improve this logging message
+                val msg =
+                    "All ${Validator::class.simpleName!!}.${Validator<*>::errorType.name} of class ${this.qualifiedName!!.asString()} must have the same type: $errorType, one type was: $it"
+                logger.error(msg, this)
+                throw Exception(msg)
+            }
         }
     }
 
@@ -235,13 +242,39 @@ fun $className.toValidator(): $validatorClass {
 
     fun KSPropertyDeclaration.getDerivedPropertyDeclaration(): String {
         val propertyName = simpleName.asString()
+        val dependencies = annotations
+            .getHierarchy()
+            .filterAnnotationsByType(DependsOn::class)
+            .firstOrNull()
+            ?.arguments
+            ?.firstOrNull { it.name?.asString() == DependsOn::dependencies.name }
+            ?.run { value as ArrayList<*> }
+
+        if (dependencies != null) {
+            logger.info(
+                "Detected dependencies on property `${simpleName.asString()}`.",
+                symbol = this
+            )
+        }
+
+        val usedDependencies = dependencies
+            ?.map { it as String }
+            ?.joinToString(separator = " || ") { dependency -> "this.$dependency.used" }
+
         val propertyType = getValidatorConstructorProperty()
-        val paramStateInstantiation = getParamStateInstantiation("this.toData().$propertyName")
+        val paramStateInstantiation =
+            getParamStateInstantiation(
+                paramStateValue = "this.toData().$propertyName",
+                paramStateUsed = usedDependencies ?: "false",
+            )
 
         return "$propertyType = $paramStateInstantiation"
     }
 
-    fun KSPropertyDeclaration.getParamStateInstantiation(paramStateValue: String): String {
+    fun KSPropertyDeclaration.getParamStateInstantiation(
+        paramStateValue: String,
+        paramStateUsed: String = "false",
+    ): String {
         val propertyType = type.resolve().getType()!!
         type.resolve().isMarkedNullable
         val errorType = annotations
@@ -279,7 +312,7 @@ fun $className.toValidator(): $validatorClass {
                 listOf<${ValidatorCond::class.qualifiedName!!}<$propertyType, $errorType>>(
                     ${validatorClasses.joinToString()}
                 ).flatMap { it.conditions },
-            used = false,
+            used = $paramStateUsed,
         )
         """.trimIndent()
     }

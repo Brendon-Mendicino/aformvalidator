@@ -6,6 +6,6 @@ import com.google.devtools.ksp.processing.SymbolProcessorProvider
 
 class FormValidatorProcessorProvider: SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
-        return FormValidatorProcessor(environment.codeGenerator)
+        return FormValidatorProcessor(environment.codeGenerator, environment.logger)
     }
 }

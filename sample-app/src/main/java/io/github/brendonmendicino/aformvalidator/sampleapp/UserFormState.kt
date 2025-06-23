@@ -1,6 +1,7 @@
 package io.github.brendonmendicino.aformvalidator.sampleapp
 
 import androidx.annotation.StringRes
+import io.github.brendonmendicino.aformvalidator.annotation.DependsOn
 import io.github.brendonmendicino.aformvalidator.annotation.Email
 import io.github.brendonmendicino.aformvalidator.annotation.FormState
 import io.github.brendonmendicino.aformvalidator.annotation.Min
@@ -27,6 +28,7 @@ data class UserFormState(
     val num: String = ""
 ) {
     @Min(3)
+    @DependsOn(["num"])
     val derived: Int? = num.toIntOrNull()
 }
 
