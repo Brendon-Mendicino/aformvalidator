@@ -92,3 +92,13 @@ fun UserFormPreview() {
 fun UserFormErrorsPreview() {
     UserForm(state = UserFormState(name = "  ", surname = " "))
 }
+
+@Preview(showBackground = true)
+@Composable
+fun Test() {
+    val state = MyLog("2024-10-01 main Hello-Friend!!").toValidator()
+    assert(state.line.error == null)
+    assert(MyLog("2024-10-01 not-main Hello-Friend!!").toValidator().line.error == "Module check failed!")
+
+    Text(state.line.value)
+}

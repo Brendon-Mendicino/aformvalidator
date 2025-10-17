@@ -345,8 +345,10 @@ fun $className.toValidator(): $validatorClass {
         val parentParameterValues = parent.arguments.associateBy { it.name!!.asString() }
 
         fun Any?.toParam(): String = when (this) {
+            // TODO: find better way to print escaped strings
             is String -> "\"\"\"${this.replace("$", "\${'$'}")}\"\"\""
             is KSType -> "${this.declaration.qualifiedName!!.asString()}::class"
+            is java.util.ArrayList<*> -> "arrayOf(${this.joinToString { it.toParam() }})"
             else -> this.toString()
         }
 

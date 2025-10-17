@@ -2,7 +2,26 @@ package io.github.brendonmendicino.aformvalidator.annotation
 
 
 /**
- * Validate a [Comparable] against a [min] value.
+ * Check if a [Number] is smaller than [min]. The validator
+ * only checks against the value of the [Number], it its value
+ * is `null` the check passes.
+ *
+ * # Examples
+ *
+ * ```
+ * @FormState
+ * data class Point(
+ *     @Min(0)
+ *     val x: Int,
+ *     @Min(0)
+ *     val y: Int?,
+ * )
+ *
+ * var state = Point(-10, null).toValidator()
+ * println(state.x.error) // Min(min=0)
+ * state = state.copy(x = state.x.update(5))
+ * println(state.errors.firstOrNull()) // null
+ * ```
  */
 @Validator<ValidationError>(
     value = Min.Companion.Validator::class,
@@ -21,7 +40,7 @@ public annotation class Min(
             override val conditions: List<(Number?) -> ValidationError?> = listOf {
                 it ?: return@listOf null
 
-                if (it.toLong() < min) ValidationError.Min(min = min.toLong())
+                if (it.toLong() < min) ValidationError.Min(min = min)
                 else null
             }
 

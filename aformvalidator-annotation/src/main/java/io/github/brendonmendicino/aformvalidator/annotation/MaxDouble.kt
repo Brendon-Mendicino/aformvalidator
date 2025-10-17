@@ -1,7 +1,7 @@
 package io.github.brendonmendicino.aformvalidator.annotation
 
 /**
- * Validate a [Comparable] against a [max] value.
+ * Same as [Max] but the value can be a [Double].
  */
 @Validator<ValidationError>(
     value = MaxDouble.Companion.Validator::class,

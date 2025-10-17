@@ -4,6 +4,21 @@ import kotlin.reflect.KClass
 
 /**
  * Validate a [String] to be a valid [Number].
+ *
+ * # Examples
+ *
+ * ```
+ * data class Person(
+ *     val name: String,
+ *     @ToNumber(Int::class)
+ *     val age: String,
+ * )
+ *
+ * val first = Person("First", "1")
+ * println(first.age.error) // null
+ * val second = Person("Second", "pluto")
+ * println(second.age.error) // ToNumber(numberClass=Int::class)
+ * ```
  */
 @Validator<ValidationError>(
     value = ToNumber.Companion.Validator::class,

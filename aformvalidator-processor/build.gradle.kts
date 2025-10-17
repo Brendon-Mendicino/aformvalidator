@@ -24,4 +24,10 @@ dependencies {
     implementation(project(":aformvalidator-annotation"))
 
     testImplementation(libs.bundles.unittest)
+//    // --- JUnit 5 (Jupiter) ---
+//    testImplementation(platform("org.junit:junit-bom:6.0.0")) // aligns all JUnit modules
+//    testImplementation("org.junit.jupiter:junit-jupiter")
+//
+//    // Optional: Kotlin test helpers (assertions, etc.)
+//    testImplementation(kotlin("test")) // wraps JUnit assertions nicely
 }

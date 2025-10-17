@@ -1,7 +1,7 @@
 package io.github.brendonmendicino.aformvalidator.annotation
 
 /**
- * Validate a [Comparable] against a [min] value.
+ * Same as [Min] but the value can be a [Double].
  */
 @Validator<ValidationError>(
     value = MinDouble.Companion.Validator::class,

@@ -2,6 +2,20 @@ package io.github.brendonmendicino.aformvalidator.annotation
 
 /**
  * Validate a [String]. It needs to have at least one character after trimming the [String].
+ *
+ * # Examples
+ *
+ * ```
+ * @FormState
+ * data class Person(@NotBlank val name: String? = null)
+ *
+ * var person = Person().toValidator()
+ * println(person.name.error) // NotBlank
+ * person = person.copy(name = person.name.update("   "))
+ * println(person.name.error) // NotBlank
+ * person = person.copy(name = person.name.update("pippo"))
+ * println(person.name.error) // null
+ * ```
  */
 @Validator<ValidationError>(
     value = NotBlank.Companion.Validator::class,

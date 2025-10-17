@@ -4,6 +4,20 @@ package io.github.brendonmendicino.aformvalidator.annotation
  * Validate a [String] as a valid email.
  *
  * Regex reference: [ref](https://www.regular-expressions.info/email.html)
+ *
+ * # Examples
+ *
+ * ```
+ * @FormState
+ * data class Person(
+ *     val name: String,
+ *     @Email
+ *     val personal: String,
+ *     // Custom pattern
+ *     @Email(pattern="""\w+@mydomain\.com""")
+ *     val work: String
+ * )
+ * ```
  */
 @Validator<ValidationError>(
     value = Email.Companion.Validator::class,
