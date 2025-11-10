@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel target="17">
+      <module name="aformvalidator.annotation.main" target="11" />
+      <module name="aformvalidator.annotation.test" target="11" />
+      <module name="aformvalidator.processor" target="17" />
+      <module name="aformvalidator.processor.main" target="17" />
+      <module name="aformvalidator.processor.test" target="17" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

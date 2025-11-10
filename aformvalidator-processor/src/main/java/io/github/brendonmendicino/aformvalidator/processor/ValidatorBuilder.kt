@@ -7,18 +7,19 @@ import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.LambdaTypeName
 import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.NOTHING
+import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.UNIT
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.buildCodeBlock
 import com.squareup.kotlinpoet.ksp.toClassName
-import io.github.brendonmendicino.aformvalidator.annotation.ParamState
-import io.github.brendonmendicino.aformvalidator.annotation.ValidatorCond
 
 class ValidatorBuilder(
     val className: ClassName,
@@ -151,10 +152,123 @@ class ValidatorBuilder(
             .build()
     }
 
+    /**
+     * ```
+     * class Validator(/* ... */) {
+     *      class Updater(private val validator: Validator) {
+     *          var propIsSet: Boolean = false
+     *          var prop: T = validator.prop.value
+     *              set(value) {
+     *                  propIsSet = true
+     *                  field = value
+     *              }
+     *
+     *          // ...
+     *
+     *          private fun build(): Validator {
+     *              return Validator(
+     *                  prop = if (propIsSet) validator.prop.update(prop) else validator.prop,
+     *                  // ...
+     *             )
+     *          }
+     *      }
+     * }
+     * ```
+     */
+    fun buildUpdater(): TypeSpec {
+        val (setConditions, updaters) = constructorProperties
+            .map { property ->
+                val isSet =
+                    PropertySpec.builder("${property.name}IsSet", Boolean::class, KModifier.PRIVATE)
+                        .mutable()
+                        .initializer("false")
+                        .build()
+
+                val updater = property.toPropertySpec().toBuilder()
+                    .mutable()
+                    .initializer("validator.${property.name}.value")
+                    .setter(
+                        FunSpec.setterBuilder()
+                            .addParameter(property.toParameterSpec())
+                            .addStatement("%N = true", isSet)
+                            .addStatement("field = %N", property.name)
+                            .build()
+                    )
+                    .build()
+
+                isSet to updater
+            }
+            .unzip()
+
+        val validatorBuilder = setConditions.zip(updaters)
+            .map { (isSet, update) ->
+                CodeBlock.of(
+                    "${update.name} = if (%N) validator.%L.update(%N) else validator.${update.name}, ",
+                    isSet,
+                    update.name,
+                    update,
+                )
+            }
+
+        return TypeSpec.classBuilder("Updater")
+            .primaryConstructor(
+                FunSpec.constructorBuilder()
+                    .addParameter(
+                        ParameterSpec.builder(
+                            "validator",
+                            validatorClass,
+                        ).build()
+                    ).build()
+            )
+            .addProperty(
+                PropertySpec.builder("validator", validatorClass, KModifier.PRIVATE)
+                    .initializer("validator")
+                    .build()
+            )
+            .addProperties(setConditions)
+            .addProperties(updaters)
+            .addFunction(
+                FunSpec.builder("build")
+                    .addModifiers(KModifier.INTERNAL)
+                    .returns(validatorClass)
+                    .addCode("return %T(", validatorClass)
+                    .apply {
+                        for (code in validatorBuilder) {
+                            addCode(code)
+                        }
+                    }
+                    .addCode(")")
+                    .build()
+            )
+            .build()
+    }
+
+    /**
+     * ```
+     * fun update(transform: Updater.() -> Unit): Validator {
+     *      val updater = Updater(this)
+     *      updater.transform()
+     *      return updater.build()
+     * }
+     * ```
+     */
+    fun updateFunc(updater: TypeName): FunSpec {
+        return FunSpec.builder("update")
+            .addModifiers(KModifier.PUBLIC)
+            .returns(validatorClass)
+            .addParameter("transform", LambdaTypeName.get(receiver = updater, returnType = UNIT))
+            .addStatement("val updater = %T(this)", updater)
+            .addStatement("updater.transform()")
+            .addStatement("return updater.build()")
+            .build()
+    }
+
     fun buildValidator(): TypeSpec {
         val (constructor, constructorProperties) = buildConstructor()
         val bodyProperties = bodyPropertySpecs()
         val toData = toDataSpec()
+        val updater = buildUpdater()
+        val update = updateFunc(validatorClass.nestedClass(updater.name!!))
 
         return TypeSpec.classBuilder(className.simpleName + "Validator")
             .addModifiers(KModifier.DATA)
@@ -162,9 +276,22 @@ class ValidatorBuilder(
             .addProperties(constructorProperties)
             .addProperties(bodyProperties)
             .addFunction(toData)
+            .addType(updater)
+            .addFunction(update)
             .build()
     }
 
+    /**
+     * fun State.toValidator(): Validator {
+     *      return Validator(
+     *          prop = ParamState<T, ERROR>(
+     *              value = this.prop,
+     *              conditions = listOf<ValidatorCond<T, ERROR>().flatMap { it.conditions }
+     *          ),
+     *          // ...
+     *      )
+     * }
+     */
     fun converterCode(): CodeBlock {
         val paramStateInit = constructorProperties.map { it.toParamState() }
             .map {
@@ -188,6 +315,9 @@ class ValidatorBuilder(
             .build()
     }
 
+    /**
+     * Build the toValidator() converter
+     */
     fun buildConverter(): FunSpec {
         return FunSpec.builder("toValidator")
             .receiver(className)
@@ -196,6 +326,9 @@ class ValidatorBuilder(
             .build()
     }
 
+    /**
+     * Generate the file with the generated Validator and toValidator()
+     */
     fun build(): FileSpec {
         return FileSpec.builder(className.packageName, validatorClass.simpleName + ".kt")
             .addType(buildValidator())
