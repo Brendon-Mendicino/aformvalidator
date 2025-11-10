@@ -11,6 +11,8 @@ import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSType
+import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.ksp.writeTo
 import io.github.brendonmendicino.aformvalidator.annotation.DependsOn
 import io.github.brendonmendicino.aformvalidator.annotation.FormState
 import io.github.brendonmendicino.aformvalidator.annotation.ParamState
@@ -18,10 +20,16 @@ import io.github.brendonmendicino.aformvalidator.annotation.Validator
 import io.github.brendonmendicino.aformvalidator.annotation.ValidatorCond
 import kotlin.reflect.KClass
 
+lateinit var globalLogger: KSPLogger
+
 class FormValidatorProcessor(
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
 ) : SymbolProcessor {
+
+    init {
+        globalLogger = logger
+    }
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val symbols = resolver.getSymbolsWithAnnotation(FormState::class.qualifiedName!!)
@@ -37,85 +45,16 @@ class FormValidatorProcessor(
     }
 
     private fun generateValidatorClass(classDeclaration: KSClassDeclaration) {
-        val className = classDeclaration.simpleName.asString()
-        val packageName = classDeclaration.packageName.asString()
-        val validatorClass = "${className}Validator"
-        val extensionClass = "${className}Extension"
-
-        // TODO: Consider using KotlinPoet instead of these crappy strings
-        val validatorClassFile = codeGenerator.createNewFile(
-            dependencies = Dependencies(true, classDeclaration.containingFile!!),
-            packageName = packageName,
-            fileName = validatorClass,
-        )
-
-        validatorClassFile.writer().use { writer ->
-            val constructorProperties = classDeclaration.getValidatorClassConstructor()
-            val derivedProperties = classDeclaration.getValidatorDerivedProperties()
-            val toDataConstructorProperties = classDeclaration.getToDataConstructorProperties()
-            val isError = classDeclaration.getValidatorClassIsError()
-            val errors = classDeclaration.getValidatorClassErrors()
-            val oneUsed = classDeclaration.getValidatorClassOneUsed()
-            val allUsed = classDeclaration.getValidatorClassAllUsed()
-
-
-            writer.write(
-                """
-@file:Suppress("warnings")
-
-package $packageName
-    
-data class $validatorClass(
-    $constructorProperties
-) {
-    $derivedProperties
-
-    $isError
-    
-    $errors
-    
-    $oneUsed
-    
-    $allUsed
-
-    fun toData(): $className {
-        return $className(
-            $toDataConstructorProperties
-        )
-    }
-}
-""".trimIndent()
+        try {
+            ValidatorBuilder.from(classDeclaration)
+                .build()
+                .writeTo(codeGenerator, aggregating = false)
+        } catch (e: Throwable) {
+            logger.error(
+                "An error occurred while processing ${classDeclaration.qualifiedName?.asString()}",
+                classDeclaration
             )
-        }
-
-        val extensionFile = codeGenerator.createNewFile(
-            dependencies = Dependencies(true, classDeclaration.containingFile!!),
-            packageName = packageName,
-            fileName = extensionClass,
-        )
-
-        extensionFile.writer().use { writer ->
-            classDeclaration.checkAllAnnotationErrorType()
-            val constructorParameters =
-                classDeclaration.getConstructorParameterNames()?.toSet() ?: emptySet()
-            val properties = classDeclaration
-                .getAllProperties()
-                .filter { it.simpleName.asString() in constructorParameters }
-                .map { it.getValidatorInstantiationProperty() }
-
-            writer.write(
-                """
-@file:Suppress("warnings")
-
-package $packageName
-
-fun $className.toValidator(): $validatorClass {
-    return $validatorClass(
-        ${properties.joinToString()}
-    )
-}
-""".trimIndent()
-            )
+            throw e
         }
     }
 
@@ -123,7 +62,7 @@ fun $className.toValidator(): $validatorClass {
      * Get the Validator class properties when calling the constructor.
      */
     fun KSClassDeclaration.getValidatorClassConstructor(): String {
-        val constructorParameters = getConstructorParameterNames()?.toSet() ?: emptySet()
+        val constructorParameters = getConstructorParameterNames().toSet()
         val properties = this
             .getAllProperties()
             .filter { it.simpleName.asString() in constructorParameters }
@@ -334,8 +273,6 @@ fun $className.toValidator(): $validatorClass {
             .filterAnnotationsByType(Validator::class)
             .map { Pair(it, this) }
 
-    fun KSClassDeclaration.getConstructorParameterNames() =
-        primaryConstructor?.parameters?.mapNotNull { it.name?.asString() }
 
     fun getValidatorConstructor(validator: KSAnnotation, parent: KSAnnotation): String {
         val validatorType = validator.getArgumentType(Validator<*>::value.name)!!

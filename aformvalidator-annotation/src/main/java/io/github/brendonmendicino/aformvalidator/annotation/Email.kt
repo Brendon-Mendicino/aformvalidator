@@ -1,5 +1,7 @@
 package io.github.brendonmendicino.aformvalidator.annotation
 
+import org.intellij.lang.annotations.Language
+
 /**
  * Validate a [String] as a valid email.
  *
@@ -27,6 +29,7 @@ package io.github.brendonmendicino.aformvalidator.annotation
 @Retention(AnnotationRetention.SOURCE)
 @MustBeDocumented
 public annotation class Email(
+    @Language("RegExp")
     val pattern: String = """\A[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\z"""
 ) {
     public companion object {

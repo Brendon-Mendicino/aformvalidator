@@ -30,4 +30,7 @@ dependencies {
 //
 //    // Optional: Kotlin test helpers (assertions, etc.)
 //    testImplementation(kotlin("test")) // wraps JUnit assertions nicely
+    testImplementation(kotlin("test"))
+    testImplementation(libs.kotlin.compile.testing)
+    testImplementation(libs.kotlin.compile.testing.ksp)
 }

@@ -1,5 +1,7 @@
 package io.github.brendonmendicino.aformvalidator.annotation
 
+import org.intellij.lang.annotations.Language
+
 /**
  * Mark that a property depends on other properties of the class.
  *
@@ -30,5 +32,6 @@ package io.github.brendonmendicino.aformvalidator.annotation
 @Retention(AnnotationRetention.SOURCE)
 @MustBeDocumented
 public annotation class DependsOn(
+//    @Language("kotlin")
     val dependencies: Array<String> = [],
 )
