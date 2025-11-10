@@ -22,6 +22,10 @@ at [sample-app](./sample-app/src/main/java/io/github/brendonmendicino/aformvalid
 To install `aformvalidator` you need to include annotations and the processor in your dependencies
 
 ```kotlin
+plugins {
+    id("com.google.devtools.ksp")
+}
+
 dependencies {
     implementation("io.github.brendon-mendicino:aformvalidator-annotation:<version>")
     implementation("io.github.brendon-mendicino:aformvalidator-processor:<version>")
@@ -196,7 +200,7 @@ class LogMessageValidator(
 }
 ```
 
-1. Create your annotation and link it with `@Validator`
+2. Create your annotation and link it with `@Validator`
     - Use the `@Validator(value = YourValidator::class, errorType = YourErrorType::class)`
       meta‑annotation on your custom annotation.
 
@@ -215,7 +219,7 @@ annotation class LogMessage(
 )
 ```
 
-1. Consume in a `@FormState` model
+3. Consume in a `@FormState` model
     - Annotate your form field with `@LogMessage(...)`, convert your instance with the generated
       helper, and read `param.isError` or `param.error`.
 

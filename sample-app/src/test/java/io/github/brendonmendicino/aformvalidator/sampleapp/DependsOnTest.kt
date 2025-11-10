@@ -6,6 +6,7 @@ import org.junit.Test
 
 @FormState
 data class FormDepends(
+    /** Tutte a me capitano... */
     @ToNumber(Int::class) val numStr: String = ""
 ) {
     @Min(0)

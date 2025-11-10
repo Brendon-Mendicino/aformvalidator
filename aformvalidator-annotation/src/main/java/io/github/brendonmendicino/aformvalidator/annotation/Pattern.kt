@@ -1,5 +1,7 @@
 package io.github.brendonmendicino.aformvalidator.annotation
 
+import org.intellij.lang.annotations.Language
+
 /**
  * Validate a [String] against a [regex] pattern.
  */
@@ -12,6 +14,7 @@ package io.github.brendonmendicino.aformvalidator.annotation
 @Repeatable
 @MustBeDocumented
 public annotation class Pattern(
+    @Language("RegExp")
     public val regex: String = ""
 ) {
     public companion object {
