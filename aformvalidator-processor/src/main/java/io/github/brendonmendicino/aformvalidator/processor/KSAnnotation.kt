@@ -2,6 +2,8 @@ package io.github.brendonmendicino.aformvalidator.processor
 
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.squareup.kotlinpoet.asTypeName
+import com.squareup.kotlinpoet.ksp.toAnnotationSpec
+import io.github.brendonmendicino.aformvalidator.annotation.DependsOn
 import io.github.brendonmendicino.aformvalidator.annotation.Validator
 
 private val LEAFS = listOf(
@@ -39,4 +41,14 @@ fun KSAnnotation.validators(depth: Int = 0): Sequence<ValAnnotation> {
             depth + 1
         )
     }
+}
+
+fun KSAnnotation.dependencies(): List<String> {
+    val spec = this.toAnnotationSpec()
+    if (spec.typeName != DependsOn::class.asTypeName())
+        return emptyList()
+
+    val dep = this.arguments.first { it.name?.asString() == DependsOn::dependencies.name }
+
+    return (dep.value as ArrayList<*>).map { it as String }
 }

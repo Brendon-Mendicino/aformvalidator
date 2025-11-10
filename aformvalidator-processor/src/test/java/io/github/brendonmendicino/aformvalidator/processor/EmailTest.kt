@@ -2,12 +2,16 @@
 
 package io.github.brendonmendicino.aformvalidator.processor
 
+import assertk.assertThat
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
 import com.tschuchort.compiletesting.symbolProcessorProviders
+import org.jetbrains.kotlin.cli.common.isCommonSourceForPsi
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.junit.Test
 import java.io.File
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 
 class EmailTest {
@@ -36,7 +40,7 @@ class EmailTest {
                 @Min(0)
                 val num: Int = 10,
             )
-        """.trimIndent()
+        """.trimIndent(),
         )
 
         val result = KotlinCompilation().apply {
@@ -44,6 +48,6 @@ class EmailTest {
             symbolProcessorProviders = listOf(FormValidatorProcessorProvider())
         }.compile()
 
-        println(result.generatedFiles.map { it.readText() })
+//        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK)
     }
 }

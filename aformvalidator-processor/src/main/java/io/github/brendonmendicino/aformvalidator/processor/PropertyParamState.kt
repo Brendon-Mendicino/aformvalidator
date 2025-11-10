@@ -38,7 +38,18 @@ class PropertyParamState(
         return builder.build()
     }
 
-    fun toInitializer(value: CodeBlock): CodeBlock {
+    fun toBodyProperty(value: CodeBlock): PropertySpec {
+        val used = CodeBlock.of(property.dependencies.joinToString(" || ") { "this.$it.used" })
+
+        val propertySpec = toPropertySpec()
+        val initializer = toInitializer(value, used)
+
+        return propertySpec.toBuilder()
+            .initializer(initializer)
+            .build()
+    }
+
+    fun toInitializer(value: CodeBlock, used: CodeBlock? = null): CodeBlock {
         val condType = ValidatorCond::class.asTypeName()
             .parameterizedBy(property.type, property.errorType)
 
@@ -49,7 +60,7 @@ class PropertyParamState(
             .add(", ")
             .add("conditions = listOf<%T>(", condType)
             .apply {
-                for ((validator, impl) in property.validators.zip(property.annotations.map { it.impl })) {
+                for ((validator, impl) in property.validators.zip(property.validatorImpls)) {
                     add("%T(", validator)
                     for (member in impl.members) {
                         add(member)
@@ -58,7 +69,14 @@ class PropertyParamState(
                     add(")")
                 }
             }
-            .add(").%M { it.conditions }", MemberName("kotlin.collections", "flatMap"))
+            .add(").%M { it.conditions }, ", MemberName("kotlin.collections", "flatMap"))
+            .apply {
+                if (used != null) {
+                    add("used = ")
+                    add(used)
+                    add(", ")
+                }
+            }
             .add(")")
             .build()
     }

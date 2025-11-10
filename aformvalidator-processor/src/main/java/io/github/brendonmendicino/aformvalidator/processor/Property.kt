@@ -20,8 +20,9 @@ class Property(
     val type: TypeName,
     val errorType: TypeName,
     val validators: List<TypeName>,
-    val annotations: List<PropertyValidator>,
+    val validatorImpls: List<AnnotationSpec>,
     val modifiers: List<KModifier>,
+    val dependencies: Set<String>,
     val kdoc: String?,
 ) {
     data class PropertyValidator(
@@ -37,10 +38,16 @@ class Property(
             val propertyName = property.simpleName.asString()
             val propertyType = property.type.toTypeName()
             val modifiers = property.modifiers.mapNotNull { it.toKModifier() }
+
             val propertyAnnotations = property
                 .annotations
                 .flatMap { annotation -> annotation.validators() }
                 .toList()
+
+            val dependencies = property
+                .annotations
+                .flatMap { annotation -> annotation.dependencies() }
+                .toSet()
 
             val errorTypes = propertyAnnotations
                 .map { annotation -> annotation.validator }
@@ -60,24 +67,14 @@ class Property(
                 .map { annotation -> annotation.arguments.first { arg -> arg.name?.asString() == Validator<*>::value.name } }
                 .map { argument -> (argument.value as KSType).toTypeName() }
 
-//            decl.toClassName().withTypeArguments(arguments.map { it.toTypeName(typeParamResolver) })
-
-            val cn = propertyAnnotations.map { it.validator }.firstOrNull()?.annotationType?.resolve()
-            val an = cn?.arguments
-            globalLogger.warn("$propertyName $propertyAnnotations ${propertyAnnotations.map { it.validator.annotationType.resolve() }} $cn ${cn?.toClassNameOrNull()} $an", property)
-
             return Property(
                 name = propertyName,
                 type = propertyType,
                 errorType = errorType,
                 validators = validators,
-                annotations = propertyAnnotations.map {
-                    PropertyValidator(
-                        it.validator.toAnnotationSpec(),
-                        it.impl.toAnnotationSpec()
-                    )
-                },
+                validatorImpls = propertyAnnotations.map { it.impl.toAnnotationSpec() },
                 modifiers = modifiers,
+                dependencies = dependencies,
                 kdoc = property.docString,
             )
         }
@@ -108,6 +105,6 @@ class Property(
     }
 
     override fun toString(): String {
-        return "Property(name=$name, type=$type, errorType=$errorType, annotations=$annotations"
+        return "Property(name=$name, type=$type, errorType=$errorType, annotations"
     }
 }

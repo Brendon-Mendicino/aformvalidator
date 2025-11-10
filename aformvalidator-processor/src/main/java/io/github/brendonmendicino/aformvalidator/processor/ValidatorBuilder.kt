@@ -59,31 +59,34 @@ class ValidatorBuilder(
     }
 
     fun bodyPropertySpecs(): List<PropertySpec> {
-        val paramStateProperties =
-            bodyProperties.map { it.toParamState() }.map { it.toPropertySpec() }
+        // Convert the body properties into ParamState and
+        // assign an initializer
+        val paramStateProperties = bodyProperties.map { it.toParamState() }
+            .map { it.toBodyProperty(CodeBlock.of("this._inner.${it.property.name}")) }
+
+        val inner = PropertySpec.builder("_inner", className, KModifier.PRIVATE)
+            .initializer("this.toData()")
+            .build()
 
         val isError = PropertySpec.builder("isError", Boolean::class, KModifier.PUBLIC)
             .initializer(
-                CodeBlock.builder()
-                    .add(allProperties.joinToString(" && ") { "this.${it.name}.isError" })
-                    .build()
+                CodeBlock.of(allProperties.joinToString(" || ") { "this.${it.name}.isError" })
             )
+            .addKdoc("True if any of the fields has an error")
             .build()
 
         val used = PropertySpec.builder("used", Boolean::class, KModifier.PUBLIC)
             .initializer(
-                CodeBlock.builder()
-                    .add(allProperties.joinToString(" || ") { "this.${it.name}.used" })
-                    .build()
+                CodeBlock.of(allProperties.joinToString(" || ") { "this.${it.name}.used" })
             )
+            .addKdoc("True if any of the fields is used")
             .build()
 
         val allUsed = PropertySpec.builder("allUsed", Boolean::class, KModifier.PUBLIC)
             .initializer(
-                CodeBlock.builder()
-                    .add(allProperties.joinToString(" && ") { "this.${it.name}.used" })
-                    .build()
+                CodeBlock.of(allProperties.joinToString(" && ") { "this.${it.name}.used" })
             )
+            .addKdoc("True if all the fields are used")
             .build()
 
         val errorType = allProperties
@@ -99,7 +102,7 @@ class ValidatorBuilder(
                 Pair::class.asTypeName().parameterizedBy(STRING, errorType.copy(nullable = false))
             )
 
-        "mapNotNull { (name, error) -> error?.let { Pair(name, error) } }"
+        // Sequence of all the errors
         val errors = PropertySpec.builder("errors", sequenceType, KModifier.PUBLIC)
             .initializer(
                 CodeBlock.builder()
@@ -118,6 +121,7 @@ class ValidatorBuilder(
                     )
                     .build()
             )
+            .addKdoc("Sequence of all the errors in the validator")
             .build()
 
         val error = PropertySpec.builder("error", errorType, KModifier.PUBLIC)
@@ -130,9 +134,10 @@ class ValidatorBuilder(
                     )
                     .build()
             )
+            .addKdoc("Get any of the field errors, if no error is present this field is `null`")
             .build()
 
-        return paramStateProperties + isError + used + allUsed + errors + error
+        return listOf(inner) + paramStateProperties + isError + used + allUsed + errors + error
 
     }
 
