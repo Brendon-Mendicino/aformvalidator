@@ -31,8 +31,27 @@ class ValidatorBuilder(
 
     val validatorClass = ClassName(className.packageName, className.simpleName + "Validator")
 
+    init {
+        val usableDeps = constructorProperties.map { it.name }.toMutableSet()
+
+        // Validate dependencies
+        for (bodyProp in bodyProperties) {
+            for (dep in bodyProp.dependencies) {
+                if (dep !in usableDeps) {
+                    val msg =
+                        "[aformvalidator] Error while processing ${className.canonicalName} property=${bodyProp.name}. The dependency property=$dep does not exists, or it's declared after \"${bodyProp.name}\" declaration! Change your @DependsOn signature."
+                    globalLogger.error(msg)
+                    throw IllegalArgumentException(msg)
+                }
+            }
+
+            usableDeps.add(bodyProp.name)
+        }
+    }
+
     companion object {
         fun from(clazz: KSClassDeclaration): ValidatorBuilder {
+            globalLogger.info("[aformvalidator] creating ValidatorBuilder for ${clazz.qualifiedName?.asString()}", clazz)
             val constructorParameters = clazz.getConstructorParameterNames().toSet()
             val (constructorProperties, bodyProperties) = clazz
                 .getAllProperties()
@@ -67,6 +86,10 @@ class ValidatorBuilder(
 
         val inner = PropertySpec.builder("_inner", className, KModifier.PRIVATE)
             .initializer("this.toData()")
+            .addKdoc(
+                """Used by bodyProperties to get their value.
+                |The reason is that in ksp it's not possible to get the setter of property.""".trimMargin()
+            )
             .build()
 
         val isError = PropertySpec.builder("isError", Boolean::class, KModifier.PUBLIC)
@@ -138,7 +161,10 @@ class ValidatorBuilder(
             .addKdoc("Get any of the field errors, if no error is present this field is `null`")
             .build()
 
-        return listOf(inner) + paramStateProperties + isError + used + allUsed + errors + error
+        // If no bodyProperty is present there is no need for the _inner
+        val innerToInsert = if (bodyProperties.isEmpty()) emptyList() else listOf(inner)
+
+        return innerToInsert + paramStateProperties + isError + used + allUsed + errors + error
 
     }
 

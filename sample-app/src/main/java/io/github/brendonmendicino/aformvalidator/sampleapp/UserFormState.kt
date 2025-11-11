@@ -18,6 +18,7 @@ data class UserFormState(
     val surname: String? = "",
     @Email
     val email: String? = "",
+    @NotBlank
     @Pattern("hello")
     val test: String? = "",
     @Size(min = 1)

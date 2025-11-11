@@ -1,6 +1,5 @@
 package io.github.brendonmendicino.aformvalidator.processor
 
-import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterSpec
@@ -39,7 +38,8 @@ class PropertyParamState(
     }
 
     fun toBodyProperty(value: CodeBlock): PropertySpec {
-        val used = CodeBlock.of(property.dependencies.joinToString(" || ") { "this.$it.used" })
+        val used = CodeBlock.of(property.dependencies.joinToString(" || ") { "this.$it.used" }
+            .ifBlank { "false" })
 
         val propertySpec = toPropertySpec()
         val initializer = toInitializer(value, used)
@@ -66,7 +66,7 @@ class PropertyParamState(
                         add(member)
                         add(", ")
                     }
-                    add(")")
+                    add("), ")
                 }
             }
             .add(").%M { it.conditions }, ", MemberName("kotlin.collections", "flatMap"))

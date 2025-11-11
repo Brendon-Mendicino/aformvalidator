@@ -9,8 +9,6 @@ import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.ksp.toAnnotationSpec
-import com.squareup.kotlinpoet.ksp.toClassName
-import com.squareup.kotlinpoet.ksp.toClassNameOrNull
 import com.squareup.kotlinpoet.ksp.toKModifier
 import com.squareup.kotlinpoet.ksp.toTypeName
 import io.github.brendonmendicino.aformvalidator.annotation.Validator
@@ -25,16 +23,12 @@ class Property(
     val dependencies: Set<String>,
     val kdoc: String?,
 ) {
-    data class PropertyValidator(
-        val validator: AnnotationSpec,
-        val impl: AnnotationSpec,
-    )
-
     companion object {
         /**
          * @throws IllegalStateException when [Validator] annotations have different [Validator.errorType]
          */
         fun from(property: KSPropertyDeclaration): Property {
+            globalLogger.info("[aformvalidator] processing property ${property.simpleName.asString()}", property)
             val propertyName = property.simpleName.asString()
             val propertyType = property.type.toTypeName()
             val modifiers = property.modifiers.mapNotNull { it.toKModifier() }
