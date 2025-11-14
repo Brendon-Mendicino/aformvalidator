@@ -1,13 +1,23 @@
 package io.github.brendonmendicino.aformvalidator.annotation
 
 /**
- * Validate a [Collection] size with upper and lower bounds.
+ * Validate with upper and lower bounds.
+ *
+ * Supported types:
+ *
+ * - [Collection]
+ * - [Map]
+ * - [CharSequence]
+ *
+ * If a type is none of the previous, the value is considered valid.
+ *
+ * `null` is considered valid.
  *
  * # Examples
  *
  * ```
  * data class BoundList(
- *     @Size(2, 10)
+ *     @Size(min=2, max=10)
  *     val list: List<Int>,
  * )
  *
@@ -33,11 +43,24 @@ public annotation class Size(
         public class Validator(
             public val min: Int,
             public val max: Int,
-        ) : ValidatorCond<Collection<*>, ValidationError> {
-            override val conditions: List<(Collection<*>) -> ValidationError?> = listOf {
-                if (min <= it.size && it.size <= max) null
-                else ValidationError.Size(min = min, max = max)
-            }
+        ) : ValidatorCond<Any, ValidationError> {
+            override val conditions: List<(Any) -> ValidationError?> = listOf(
+                {
+                    if (it !is Collection<*>) null
+                    else if (min <= it.size && it.size <= max) null
+                    else ValidationError.Size(min = min, max = max)
+                },
+                {
+                    if (it !is CharSequence) null
+                    else if (min <= it.length && it.length <= max) null
+                    else ValidationError.Size(min = min, max = max)
+                },
+                {
+                    if (it !is Map<*, *>) null
+                    else if (min <= it.size && it.size <= max) null
+                    else ValidationError.Size(min = min, max = max)
+                },
+            )
         }
     }
 }
