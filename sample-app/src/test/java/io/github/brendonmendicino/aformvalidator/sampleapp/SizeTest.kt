@@ -1,7 +1,10 @@
 package io.github.brendonmendicino.aformvalidator.sampleapp
 
 import io.github.brendonmendicino.aformvalidator.annotation.FormState
+import io.github.brendonmendicino.aformvalidator.annotation.NotBlank
 import io.github.brendonmendicino.aformvalidator.annotation.Size
+import io.github.brendonmendicino.aformvalidator.annotation.ValidationError
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -18,6 +21,13 @@ data class BoundMap(@Size(2, 10) val map: Map<Any, Any>)
 @FormState
 data class SomethingElse(@Size(2, 10) val num: Long)
 
+@FormState
+data class SizeNotBlank(
+    @NotBlank
+    @Size(max = 10)
+    val str: String?,
+)
+
 class SizeTest {
     @Test
     fun size_kdoc_examples_uses_error() {
@@ -29,13 +39,13 @@ class SizeTest {
     }
 
     @Test
-    fun `string size is between the range`() {
+    fun string_size_is_between_the_range() {
         val state = BoundString("hello").toValidator()
         assertNull(state.str.error)
     }
 
     @Test
-    fun `string size is outside the range`() {
+    fun string_size_is_outside_the_range() {
         val state1 = BoundString("").toValidator()
         val state2 = BoundString("hello to this damned place").toValidator()
 
@@ -45,13 +55,13 @@ class SizeTest {
 
 
     @Test
-    fun `map size is between the range`() {
+    fun map_size_is_between_the_range() {
         val state = BoundMap(mapOf(1 to 1, 2 to 2, 3 to 3)).toValidator()
         assertNull(state.map.error)
     }
 
     @Test
-    fun `map size is outside the range`() {
+    fun map_size_is_outside_the_range() {
         val state1 = BoundMap(mapOf()).toValidator()
         val state2 = BoundMap((0..20).associateWith { it }).toValidator()
 
@@ -60,9 +70,21 @@ class SizeTest {
     }
 
     @Test
-    fun `something without a size should be valid`() {
+    fun something_without_a_size_should_be_valid() {
         val s = SomethingElse(1).toValidator()
         assertNull(s.num.error)
+    }
+
+    @Test
+    fun string_with_not_blank_should_not_error() {
+        val s = SizeNotBlank("hello").toValidator()
+        assertNull(s.str.error)
+    }
+
+    @Test
+    fun string_with_not_blank_full_bank_is_error() {
+        val s = SizeNotBlank("    ").toValidator()
+        assertEquals(s.str.error, ValidationError.NotBlank)
     }
 }
 

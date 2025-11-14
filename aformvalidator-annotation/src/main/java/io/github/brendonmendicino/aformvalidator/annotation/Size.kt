@@ -43,8 +43,8 @@ public annotation class Size(
         public class Validator(
             public val min: Int,
             public val max: Int,
-        ) : ValidatorCond<Any, ValidationError> {
-            override val conditions: List<(Any) -> ValidationError?> = listOf(
+        ) : ValidatorCond<Any?, ValidationError> {
+            override val conditions: List<(Any?) -> ValidationError?> = listOf(
                 {
                     if (it !is Collection<*>) null
                     else if (min <= it.size && it.size <= max) null

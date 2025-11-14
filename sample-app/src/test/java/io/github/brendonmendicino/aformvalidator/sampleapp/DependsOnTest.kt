@@ -41,7 +41,7 @@ class DependsOnTest {
     }
 
     @Test
-    fun `testing empty dependency`() {
+    fun testing_empty_dependency() {
         var form = EmptyDepends(numStr = "-5").toValidator()
         assertNotNull("Derived num below min → error", form.num.error)
 
