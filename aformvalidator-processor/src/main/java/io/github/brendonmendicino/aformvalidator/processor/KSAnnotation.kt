@@ -5,6 +5,7 @@ import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.ksp.toAnnotationSpec
 import io.github.brendonmendicino.aformvalidator.annotation.DependsOn
 import io.github.brendonmendicino.aformvalidator.annotation.Validator
+import kotlin.reflect.KClass
 
 private val LEAFS = listOf(
     Target::class,
@@ -51,4 +52,8 @@ fun KSAnnotation.dependencies(): List<String> {
     val dep = this.arguments.first { it.name?.asString() == DependsOn::dependencies.name }
 
     return (dep.value as ArrayList<*>).map { it as String }
+}
+
+fun KSAnnotation.isClass(clazz: KClass<*>): Boolean {
+    return this.toAnnotationSpec().typeName == clazz.asTypeName()
 }

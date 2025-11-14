@@ -8,14 +8,14 @@ import com.github.michaelbull.result.mapResult
 public data class ParamState<T, out E : Any>(
     public val value: T,
     public val conditions: List<(T) -> E?> = emptyList(),
-    public val used: Boolean = false,
-) {
-    public val error: E?
+    public override val used: Boolean = false,
+) : ValidatorState<E> {
+    public override val error: E?
         get() = conditions
             .mapResult { condition -> condition(value)?.let { Err(it) } ?: Ok(Unit) }
             .getErrorOr(null)
 
-    public val isError: Boolean = used && error != null
+    public override val isError: Boolean = used && error != null
 
     public fun update(value: T = this.value): ParamState<T, E> = ParamState(
         value = value,

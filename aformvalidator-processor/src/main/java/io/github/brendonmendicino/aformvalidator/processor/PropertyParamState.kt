@@ -49,6 +49,9 @@ class PropertyParamState(
             .build()
     }
 
+    /**
+     * Call the constructor of [ParamState] with the initialization of the fields.
+     */
     fun toInitializer(value: CodeBlock, used: CodeBlock? = null): CodeBlock {
         val condType = ValidatorCond::class.asTypeName()
             .parameterizedBy(property.type, property.errorType)

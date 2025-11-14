@@ -11,6 +11,7 @@ import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.ksp.toAnnotationSpec
 import com.squareup.kotlinpoet.ksp.toKModifier
 import com.squareup.kotlinpoet.ksp.toTypeName
+import io.github.brendonmendicino.aformvalidator.annotation.ToValidator
 import io.github.brendonmendicino.aformvalidator.annotation.Validator
 
 class Property(
@@ -21,6 +22,7 @@ class Property(
     val validatorImpls: List<AnnotationSpec>,
     val modifiers: List<KModifier>,
     val dependencies: Set<String>,
+    val toValidator: Boolean,
     val kdoc: String?,
 ) {
     companion object {
@@ -28,7 +30,10 @@ class Property(
          * @throws IllegalStateException when [Validator] annotations have different [Validator.errorType]
          */
         fun from(property: KSPropertyDeclaration): Property {
-            globalLogger.info("[aformvalidator] processing property ${property.simpleName.asString()}", property)
+            globalLogger.info(
+                "[aformvalidator] processing property ${property.simpleName.asString()}",
+                property
+            )
             val propertyName = property.simpleName.asString()
             val propertyType = property.type.toTypeName()
             val modifiers = property.modifiers.mapNotNull { it.toKModifier() }
@@ -61,6 +66,12 @@ class Property(
                 .map { annotation -> annotation.arguments.first { arg -> arg.name?.asString() == Validator<*>::value.name } }
                 .map { argument -> (argument.value as KSType).toTypeName() }
 
+            val toValidator = property.annotations.any { annotation ->
+                annotation.isClass(
+                    ToValidator::class
+                )
+            }
+
             return Property(
                 name = propertyName,
                 type = propertyType,
@@ -69,6 +80,7 @@ class Property(
                 validatorImpls = propertyAnnotations.map { it.impl.toAnnotationSpec() },
                 modifiers = modifiers,
                 dependencies = dependencies,
+                toValidator = toValidator,
                 kdoc = property.docString,
             )
         }

@@ -11,6 +11,7 @@ import com.squareup.kotlinpoet.LambdaTypeName
 import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.NOTHING
 import com.squareup.kotlinpoet.ParameterSpec
+import com.squareup.kotlinpoet.ParameterizedTypeName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.STRING
@@ -20,6 +21,7 @@ import com.squareup.kotlinpoet.UNIT
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.buildCodeBlock
 import com.squareup.kotlinpoet.ksp.toClassName
+import io.github.brendonmendicino.aformvalidator.annotation.ValidatorState
 
 class ValidatorBuilder(
     val className: ClassName,
@@ -30,6 +32,17 @@ class ValidatorBuilder(
         get() = constructorProperties + bodyProperties
 
     val validatorClass = ClassName(className.packageName, className.simpleName + "Validator")
+
+    /**
+     * Global errorType of the validator
+     */
+    val errorType: TypeName = allProperties
+        .map { it.errorType }.filter { it != NOTHING }.distinct()
+        .let {
+            if (it.size > 1) ANY
+            else it.firstOrNull() ?: NOTHING
+        }
+        .copy(nullable = true)
 
     init {
         val usableDeps = constructorProperties.map { it.name }.toMutableSet()
@@ -51,7 +64,10 @@ class ValidatorBuilder(
 
     companion object {
         fun from(clazz: KSClassDeclaration): ValidatorBuilder {
-            globalLogger.info("[aformvalidator] creating ValidatorBuilder for ${clazz.qualifiedName?.asString()}", clazz)
+            globalLogger.info(
+                "[aformvalidator] creating ValidatorBuilder for ${clazz.qualifiedName?.asString()}",
+                clazz
+            )
             val constructorParameters = clazz.getConstructorParameterNames().toSet()
             val (constructorProperties, bodyProperties) = clazz
                 .getAllProperties()
@@ -92,19 +108,21 @@ class ValidatorBuilder(
             )
             .build()
 
-        val isError = PropertySpec.builder("isError", Boolean::class, KModifier.PUBLIC)
-            .initializer(
-                CodeBlock.of(allProperties.joinToString(" || ") { "this.${it.name}.isError" })
-            )
-            .addKdoc("True if any of the fields has an error")
-            .build()
+        val isError =
+            PropertySpec.builder("isError", Boolean::class, KModifier.PUBLIC, KModifier.OVERRIDE)
+                .initializer(
+                    CodeBlock.of(allProperties.joinToString(" || ") { "this.${it.name}.isError" })
+                )
+                .addKdoc("True if any of the fields has an error")
+                .build()
 
-        val used = PropertySpec.builder("used", Boolean::class, KModifier.PUBLIC)
-            .initializer(
-                CodeBlock.of(allProperties.joinToString(" || ") { "this.${it.name}.used" })
-            )
-            .addKdoc("True if any of the fields is used")
-            .build()
+        val used =
+            PropertySpec.builder("used", Boolean::class, KModifier.PUBLIC, KModifier.OVERRIDE)
+                .initializer(
+                    CodeBlock.of(allProperties.joinToString(" || ") { "this.${it.name}.used" })
+                )
+                .addKdoc("True if any of the fields is used")
+                .build()
 
         val allUsed = PropertySpec.builder("allUsed", Boolean::class, KModifier.PUBLIC)
             .initializer(
@@ -112,14 +130,6 @@ class ValidatorBuilder(
             )
             .addKdoc("True if all the fields are used")
             .build()
-
-        val errorType = allProperties
-            .map { it.errorType }.filter { it != NOTHING }.distinct()
-            .let {
-                if (it.size > 1) ANY
-                else it.firstOrNull() ?: NOTHING
-            }
-            .copy(nullable = true)
 
         val sequenceType = Sequence::class.asTypeName()
             .parameterizedBy(
@@ -148,7 +158,7 @@ class ValidatorBuilder(
             .addKdoc("Sequence of all the errors in the validator")
             .build()
 
-        val error = PropertySpec.builder("error", errorType, KModifier.PUBLIC)
+        val error = PropertySpec.builder("error", errorType, KModifier.PUBLIC, KModifier.OVERRIDE)
             .initializer(
                 CodeBlock.builder()
                     .addStatement(
@@ -176,6 +186,10 @@ class ValidatorBuilder(
             .returns(className)
             .addStatement("return %T($constructorInitializer)", className)
             .build()
+    }
+
+    fun validatorStateInterface(): ParameterizedTypeName {
+        return ValidatorState::class.asTypeName().parameterizedBy(errorType.copy(nullable = false))
     }
 
     /**
@@ -296,8 +310,9 @@ class ValidatorBuilder(
         val updater = buildUpdater()
         val update = updateFunc(validatorClass.nestedClass(updater.name!!))
 
-        return TypeSpec.classBuilder(className.simpleName + "Validator")
+        return TypeSpec.classBuilder(validatorClass)
             .addModifiers(KModifier.DATA)
+            .addSuperinterface(validatorStateInterface())
             .primaryConstructor(constructor)
             .addProperties(constructorProperties)
             .addProperties(bodyProperties)
