@@ -1,7 +1,9 @@
 package io.github.brendonmendicino.aformvalidator.annotation
 
 /**
- * Validate a [String]. It needs to have at least one character after trimming the [String].
+ * Validate a [String]. It needs to have at least one non-white character.
+ *
+ * `null` is considered valid.
  *
  * # Examples
  *
@@ -29,7 +31,8 @@ public annotation class NotBlank {
     public companion object {
         public class Validator : ValidatorCond<String?, ValidationError> {
             override val conditions: List<(String?) -> ValidationError?> = listOf { str ->
-                if (str?.trim()?.isEmpty() != false) ValidationError.NotBlank
+                if (str == null) null
+                else if (str.isBlank()) ValidationError.NotBlank
                 else null
             }
         }

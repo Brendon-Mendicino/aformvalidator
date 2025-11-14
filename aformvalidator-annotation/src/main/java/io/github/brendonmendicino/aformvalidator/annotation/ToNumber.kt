@@ -5,6 +5,8 @@ import kotlin.reflect.KClass
 /**
  * Validate a [String] to be a valid [Number].
  *
+ * `null` is considered valid.
+ *
  * # Examples
  *
  * ```

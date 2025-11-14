@@ -9,26 +9,26 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
 
-@FormState
-data class BoundList(@Size(2, 10) val list: List<Int>)
-
-@FormState
-data class BoundString(@Size(2, 10) val str: String)
-
-@FormState
-data class BoundMap(@Size(2, 10) val map: Map<Any, Any>)
-
-@FormState
-data class SomethingElse(@Size(2, 10) val num: Long)
-
-@FormState
-data class SizeNotBlank(
-    @NotBlank
-    @Size(max = 10)
-    val str: String?,
-)
-
 class SizeTest {
+    @FormState
+    data class BoundList(@Size(2, 10) val list: List<Int>)
+
+    @FormState
+    data class BoundString(@Size(2, 10) val str: String)
+
+    @FormState
+    data class BoundMap(@Size(2, 10) val map: Map<Any, Any>)
+
+    @FormState
+    data class SomethingElse(@Size(2, 10) val num: Long)
+
+    @FormState
+    data class SizeNotBlank(
+        @NotBlank
+        @Size(max = 10)
+        val str: String?,
+    )
+
     @Test
     fun size_kdoc_examples_uses_error() {
         val empty = BoundList(listOf()).toValidator()

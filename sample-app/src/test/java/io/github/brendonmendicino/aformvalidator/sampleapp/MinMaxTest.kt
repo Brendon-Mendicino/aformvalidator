@@ -1,15 +1,18 @@
 package io.github.brendonmendicino.aformvalidator.sampleapp
-import org.junit.Assert.*
+import io.github.brendonmendicino.aformvalidator.annotation.FormState
+import io.github.brendonmendicino.aformvalidator.annotation.Max
+import io.github.brendonmendicino.aformvalidator.annotation.Min
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Test
-import io.github.brendonmendicino.aformvalidator.annotation.*
-
-@FormState
-data class PointMin(@Min(0) val x: Int, @Min(0) val y: Int?)
-
-@FormState
-data class PointMax(@Max(10) val x: Int, @Max(10) val y: Int?)
 
 class MinMaxTest {
+    @FormState
+    data class PointMin(@Min(0) val x: Int, @Min(0) val y: Int?)
+
+    @FormState
+    data class PointMax(@Max(10) val x: Int, @Max(10) val y: Int?)
+
     @Test
     fun min_kdoc_sequence_uses_error() {
         var state = PointMin(-10, null).toValidator()

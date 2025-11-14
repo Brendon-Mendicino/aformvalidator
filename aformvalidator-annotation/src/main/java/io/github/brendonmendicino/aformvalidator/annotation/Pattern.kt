@@ -22,8 +22,9 @@ public annotation class Pattern(
             override val conditions: List<(String?) -> ValidationError?> = listOf {
                 val toMatch = regex.toRegex()
 
-                if (it == null || !toMatch.matches(it)) ValidationError.Pattern(regex = regex)
-                else null
+                if (it == null) null
+                else if (toMatch.matches(it)) null
+                else ValidationError.Pattern(regex = regex)
             }
         }
     }

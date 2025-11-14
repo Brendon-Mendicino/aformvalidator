@@ -6,6 +6,8 @@ package io.github.brendonmendicino.aformvalidator.annotation
  * only checks against the value of the [Number], it its value
  * is `null` the check passes.
  *
+ * `null` is considered valid.
+ *
  * # Examples
  *
  * ```

@@ -7,6 +7,8 @@ import org.intellij.lang.annotations.Language
  *
  * Regex reference: [ref](https://www.regular-expressions.info/email.html)
  *
+ * `null` is considered valid
+ *
  * # Examples
  *
  * ```
@@ -33,12 +35,13 @@ public annotation class Email(
     val pattern: String = """\A[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\z"""
 ) {
     public companion object {
-        public class Validator(pattern: String): ValidatorCond<String?, ValidationError> {
+        public class Validator(pattern: String) : ValidatorCond<String?, ValidationError> {
             override val conditions: List<(String?) -> ValidationError?> = listOf {
                 val toMatch = pattern.toRegex()
 
-                if (it == null || !toMatch.matches(it)) ValidationError.Email
-                else null
+                if (it == null) null
+                else if (toMatch.matches(it)) null
+                else ValidationError.Email
             }
         }
     }

@@ -10,27 +10,27 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
 
-@FormState
-data class FormDepends(
-    /** Tutte a me capitano... */
-    @ToNumber(Int::class) val numStr: String = ""
-) {
-    @Min(0)
-    @DependsOn(["numStr"])
-    val num: Int? = numStr.toIntOrNull()
-}
-
-@FormState
-data class EmptyDepends(
-    /** Tutte a me capitano... */
-    @ToNumber(Int::class) val numStr: String = ""
-) {
-    @Min(0)
-    @DependsOn
-    val num: Int? = numStr.toIntOrNull()
-}
-
 class DependsOnTest {
+    @FormState
+    data class FormDepends(
+        /** Tutte a me capitano... */
+        @ToNumber(Int::class) val numStr: String = "",
+    ) {
+        @Min(0)
+        @DependsOn(["numStr"])
+        val num: Int? = numStr.toIntOrNull()
+    }
+
+    @FormState
+    data class EmptyDepends(
+        /** Tutte a me capitano... */
+        @ToNumber(Int::class) val numStr: String = ""
+    ) {
+        @Min(0)
+        @DependsOn
+        val num: Int? = numStr.toIntOrNull()
+    }
+
     @Test
     fun dependsOn_tracks_error_on_derived_field() {
         var form = FormDepends(numStr = "-5").toValidator()

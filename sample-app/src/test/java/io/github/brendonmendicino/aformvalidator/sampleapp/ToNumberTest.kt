@@ -1,16 +1,18 @@
 package io.github.brendonmendicino.aformvalidator.sampleapp
 
-import org.junit.Assert.*
+import io.github.brendonmendicino.aformvalidator.annotation.FormState
+import io.github.brendonmendicino.aformvalidator.annotation.ToNumber
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Test
-import io.github.brendonmendicino.aformvalidator.annotation.*
-
-@FormState
-data class PersonToNumber(
-    val name: String = "",
-    @ToNumber(Int::class) val age: String = ""
-)
 
 class ToNumberTest {
+    @FormState
+    data class PersonToNumber(
+        val name: String = "",
+        @ToNumber(Int::class) val age: String = ""
+    )
+
     @Test
     fun toNumber_kdoc_examples_uses_error() {
         val first = PersonToNumber("First", "1").toValidator()

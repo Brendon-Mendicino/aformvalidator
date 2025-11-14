@@ -44,6 +44,7 @@ dependencies {
 
     implementation(project(":aformvalidator-processor"))
     ksp(project(":aformvalidator-processor"))
+    kspTest(project(":aformvalidator-processor"))
     implementation(project(":aformvalidator-annotation"))
 
     implementation(libs.androidx.core.ktx)
