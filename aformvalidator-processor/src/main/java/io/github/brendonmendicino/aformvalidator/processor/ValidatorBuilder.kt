@@ -1,25 +1,22 @@
 package io.github.brendonmendicino.aformvalidator.processor
 
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.LambdaTypeName
 import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.NOTHING
-import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.STRING
-import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
-import com.squareup.kotlinpoet.UNIT
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.buildCodeBlock
+import com.squareup.kotlinpoet.joinToCode
 import com.squareup.kotlinpoet.ksp.toClassName
+import com.squareup.kotlinpoet.ksp.toTypeName
 
 class ValidatorBuilder(
     val className: ClassName,
@@ -51,7 +48,10 @@ class ValidatorBuilder(
 
     companion object {
         fun from(clazz: KSClassDeclaration): ValidatorBuilder {
-            globalLogger.info("[aformvalidator] creating ValidatorBuilder for ${clazz.qualifiedName?.asString()}", clazz)
+            globalLogger.info(
+                "[aformvalidator] creating ValidatorBuilder for ${clazz.qualifiedName?.asString()}",
+                clazz
+            )
             val constructorParameters = clazz.getConstructorParameterNames().toSet()
             val (constructorProperties, bodyProperties) = clazz
                 .getAllProperties()
@@ -113,13 +113,10 @@ class ValidatorBuilder(
             .addKdoc("True if all the fields are used")
             .build()
 
-        val errorType = allProperties
-            .map { it.errorType }.filter { it != NOTHING }.distinct()
-            .let {
-                if (it.size > 1) ANY
-                else it.firstOrNull() ?: NOTHING
-            }
-            .copy(nullable = true)
+        val errorType = allProperties.mapNotNull { it.errorKSType }
+            .reduceOrNull { l, r -> l.commonAncestor(r) }
+            ?.toTypeName()
+            ?: NOTHING
 
         val sequenceType = Sequence::class.asTypeName()
             .parameterizedBy(
@@ -148,7 +145,7 @@ class ValidatorBuilder(
             .addKdoc("Sequence of all the errors in the validator")
             .build()
 
-        val error = PropertySpec.builder("error", errorType, KModifier.PUBLIC)
+        val error = PropertySpec.builder("error", errorType.copy(nullable = true), KModifier.PUBLIC)
             .initializer(
                 CodeBlock.builder()
                     .addStatement(
@@ -170,131 +167,20 @@ class ValidatorBuilder(
 
     fun toDataSpec(): FunSpec {
         val constructorInitializer = constructorProperties
-            .joinToString(separator = ",\n") { "${it.name} = this.${it.name}.value" }
+            .map { CodeBlock.of("${it.name} = this.${it.name}.value") }
 
         return FunSpec.builder("toData")
             .returns(className)
-            .addStatement("return %T($constructorInitializer)", className)
-            .build()
-    }
-
-    /**
-     * ```
-     * class Validator(/* ... */) {
-     *      class Updater(private val validator: Validator) {
-     *          var propIsSet: Boolean = false
-     *          var prop: T = validator.prop.value
-     *              set(value) {
-     *                  propIsSet = true
-     *                  field = value
-     *              }
-     *
-     *          // ...
-     *
-     *          private fun build(): Validator {
-     *              return Validator(
-     *                  prop = if (propIsSet) validator.prop.update(prop) else validator.prop,
-     *                  // ...
-     *             )
-     *          }
-     *      }
-     * }
-     * ```
-     */
-    fun buildUpdater(): TypeSpec {
-        val (setConditions, updaters) = constructorProperties
-            .map { property ->
-                val isSet =
-                    PropertySpec.builder("${property.name}IsSet", Boolean::class, KModifier.PRIVATE)
-                        .mutable()
-                        .initializer("false")
-                        .build()
-
-                val updater = property.toPropertySpec().toBuilder()
-                    .mutable()
-                    .initializer("validator.${property.name}.value")
-                    .setter(
-                        FunSpec.setterBuilder()
-                            .addParameter(property.toParameterSpec())
-                            .addStatement("%N = true", isSet)
-                            .addStatement("field = %N", property.name)
-                            .build()
-                    )
-                    .build()
-
-                isSet to updater
-            }
-            .unzip()
-
-        val validatorBuilder = setConditions.zip(updaters)
-            .map { (isSet, update) ->
-                CodeBlock.of(
-                    "${update.name} = if (%N) validator.%L.update(%N) else validator.${update.name}, ",
-                    isSet,
-                    update.name,
-                    update,
-                )
-            }
-
-        return TypeSpec.classBuilder("Updater")
-            .primaryConstructor(
-                FunSpec.constructorBuilder()
-                    .addParameter(
-                        ParameterSpec.builder(
-                            "validator",
-                            validatorClass,
-                        ).build()
-                    ).build()
-            )
-            .addProperty(
-                PropertySpec.builder("validator", validatorClass, KModifier.PRIVATE)
-                    .initializer("validator")
-                    .build()
-            )
-            .addProperties(setConditions)
-            .addProperties(updaters)
-            .addFunction(
-                FunSpec.builder("build")
-                    .addModifiers(KModifier.INTERNAL)
-                    .returns(validatorClass)
-                    .addCode("return %T(", validatorClass)
-                    .apply {
-                        for (code in validatorBuilder) {
-                            addCode(code)
-                        }
-                    }
-                    .addCode(")")
-                    .build()
-            )
-            .build()
-    }
-
-    /**
-     * ```
-     * fun update(transform: Updater.() -> Unit): Validator {
-     *      val updater = Updater(this)
-     *      updater.transform()
-     *      return updater.build()
-     * }
-     * ```
-     */
-    fun updateFunc(updater: TypeName): FunSpec {
-        return FunSpec.builder("update")
-            .addModifiers(KModifier.PUBLIC)
-            .returns(validatorClass)
-            .addParameter("transform", LambdaTypeName.get(receiver = updater, returnType = UNIT))
-            .addStatement("val updater = %T(this)", updater)
-            .addStatement("updater.transform()")
-            .addStatement("return updater.build()")
+            .addStatement("return %T(%L)", className, constructorInitializer.joinToCode(", "))
             .build()
     }
 
     fun buildValidator(): TypeSpec {
+        val updater = StateUpdater(validatorClass, constructorProperties)
+
         val (constructor, constructorProperties) = buildConstructor()
         val bodyProperties = bodyPropertySpecs()
         val toData = toDataSpec()
-        val updater = buildUpdater()
-        val update = updateFunc(validatorClass.nestedClass(updater.name!!))
 
         return TypeSpec.classBuilder(className.simpleName + "Validator")
             .addModifiers(KModifier.DATA)
@@ -302,8 +188,8 @@ class ValidatorBuilder(
             .addProperties(constructorProperties)
             .addProperties(bodyProperties)
             .addFunction(toData)
-            .addType(updater)
-            .addFunction(update)
+            .addType(updater.updater())
+            .addFunction(updater.updateFunc())
             .build()
     }
 
@@ -312,32 +198,24 @@ class ValidatorBuilder(
      *      return Validator(
      *          prop = ParamState<T, ERROR>(
      *              value = this.prop,
-     *              conditions = listOf<ValidatorCond<T, ERROR>().flatMap { it.conditions }
+     *              conditions = listOf<ValidatorCond<T, ERROR>(),
      *          ),
      *          // ...
      *      )
      * }
      */
     fun converterCode(): CodeBlock {
-        val paramStateInit = constructorProperties.map { it.toParamState() }
-            .map {
-                it.toInitializer(
-                    CodeBlock.builder()
-                        .add("this.${it.property.name}")
-                        .build()
-                )
+        val paramStateInit = constructorProperties
+            .map { it.toParamState() }
+            .map { paramState ->
+                paramState.toInitializer(value = CodeBlock.of("this.${paramState.property.name}"))
             }
 
+        val paramStateConstructorCalls = paramStateInit.zip(constructorProperties)
+            .map { (stateInit, prop) -> CodeBlock.of("${prop.name} = %L", stateInit) }
+
         return CodeBlock.builder()
-            .add("return %T(", validatorClass)
-            .apply {
-                for ((stateInit, prop) in paramStateInit.zip(constructorProperties)) {
-                    add("${prop.name} = ")
-                    add(stateInit)
-                    add(", ")
-                }
-            }
-            .add(")")
+            .add("return %T(%L)", validatorClass, paramStateConstructorCalls.joinToCode(", "))
             .build()
     }
 

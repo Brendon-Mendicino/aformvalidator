@@ -1,7 +1,7 @@
 package io.github.brendonmendicino.aformvalidator.sampleapp
 
-import io.github.brendonmendicino.aformvalidator.annotation.Email
-import io.github.brendonmendicino.aformvalidator.annotation.FormState
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.Email
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.FormState
 import org.junit.Assert.assertNull
 import org.junit.Test
 

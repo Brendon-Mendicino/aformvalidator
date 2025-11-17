@@ -1,5 +1,7 @@
-package io.github.brendonmendicino.aformvalidator.annotation
+package io.github.brendonmendicino.aformvalidator.annotation.annotations
 
+import io.github.brendonmendicino.aformvalidator.annotation.Validator
+import io.github.brendonmendicino.aformvalidator.annotation.validators.EmailValidator
 import org.intellij.lang.annotations.Language
 
 /**
@@ -23,26 +25,11 @@ import org.intellij.lang.annotations.Language
  * )
  * ```
  */
-@Validator<ValidationError>(
-    value = Email.Companion.Validator::class,
-    errorType = ValidationError::class,
-)
+@Validator(EmailValidator::class)
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.ANNOTATION_CLASS)
 @Retention(AnnotationRetention.SOURCE)
 @MustBeDocumented
 public annotation class Email(
     @Language("RegExp")
     val pattern: String = """\A[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\z"""
-) {
-    public companion object {
-        public class Validator(pattern: String) : ValidatorCond<String?, ValidationError> {
-            override val conditions: List<(String?) -> ValidationError?> = listOf {
-                val toMatch = pattern.toRegex()
-
-                if (it == null) null
-                else if (toMatch.matches(it)) null
-                else ValidationError.Email
-            }
-        }
-    }
-}
+)

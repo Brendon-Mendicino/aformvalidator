@@ -19,5 +19,4 @@ kotlin {
 
 dependencies {
     implementation(libs.kotlin.stdlib)
-    implementation(libs.bundles.kotlin.result)
 }

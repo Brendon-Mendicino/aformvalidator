@@ -1,5 +1,6 @@
 package io.github.brendonmendicino.aformvalidator.processor
 
+import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.squareup.kotlinpoet.AnnotationSpec
@@ -9,14 +10,15 @@ import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.ksp.toAnnotationSpec
+import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.toKModifier
 import com.squareup.kotlinpoet.ksp.toTypeName
-import io.github.brendonmendicino.aformvalidator.annotation.Validator
 
 class Property(
     val name: String,
     val type: TypeName,
     val errorType: TypeName,
+    val errorKSType: KSType?,
     val validators: List<TypeName>,
     val validatorImpls: List<AnnotationSpec>,
     val modifiers: List<KModifier>,
@@ -24,11 +26,11 @@ class Property(
     val kdoc: String?,
 ) {
     companion object {
-        /**
-         * @throws IllegalStateException when [Validator] annotations have different [Validator.errorType]
-         */
         fun from(property: KSPropertyDeclaration): Property {
-            globalLogger.info("[aformvalidator] processing property ${property.simpleName.asString()}", property)
+            globalLogger.info(
+                "[aformvalidator] processing property ${property.simpleName.asString()}",
+                property
+            )
             val propertyName = property.simpleName.asString()
             val propertyType = property.type.toTypeName()
             val modifiers = property.modifiers.mapNotNull { it.toKModifier() }
@@ -43,28 +45,23 @@ class Property(
                 .flatMap { annotation -> annotation.dependencies() }
                 .toSet()
 
-            val errorTypes = propertyAnnotations
-                .map { annotation -> annotation.validator }
-                // Get the errorType argument of every annotation
-                .map { annotation -> annotation.arguments.first { arg -> arg.name?.asString() == Validator<*>::errorType.name } }
-                .map { argument -> (argument.value as KSType).toTypeName() }
-                .distinct()
+            val (validators, errorTypes) = propertyAnnotations
+                .flatMap { annotation -> annotation.validator.validatorClasses() }
+                .map { (validatorRef, errorRef) -> validatorRef.toClassName() to errorRef }
+                .unzip()
 
-            if (errorTypes.size > 1) {
-                throw IllegalStateException("property=\"$propertyName\" is annotated with different @Validators errorType. All errorTypes must equals! Types found: $errorTypes")
-            }
+            // Find the most common ancestor among the error types
+            val errorKSType = errorTypes
+                .filter { type -> type.declaration is KSClassDeclaration }
+                .reduceOrNull { l, r -> l.commonAncestor(r) }
 
-            val errorType = errorTypes.firstOrNull() ?: NOTHING
-
-            val validators = propertyAnnotations
-                .map { annotation -> annotation.validator }
-                .map { annotation -> annotation.arguments.first { arg -> arg.name?.asString() == Validator<*>::value.name } }
-                .map { argument -> (argument.value as KSType).toTypeName() }
+            val errorType = errorKSType?.toTypeName() ?: NOTHING
 
             return Property(
                 name = propertyName,
                 type = propertyType,
                 errorType = errorType,
+                errorKSType = errorKSType,
                 validators = validators,
                 validatorImpls = propertyAnnotations.map { it.impl.toAnnotationSpec() },
                 modifiers = modifiers,
@@ -99,6 +96,6 @@ class Property(
     }
 
     override fun toString(): String {
-        return "Property(name=$name, type=$type, errorType=$errorType, annotations"
+        return "Property(name=$name, type=$type, errorType=$errorType, validators=$validators)"
     }
 }

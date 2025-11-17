@@ -1,11 +1,9 @@
-package io.github.brendonmendicino.aformvalidator.annotation
-
-import org.intellij.lang.annotations.Language
+package io.github.brendonmendicino.aformvalidator.annotation.annotations
 
 /**
  * Mark that a property depends on other properties of the class.
  *
- * Used to correctly updated the [ParamState.used] parameter.
+ * Used to correctly updated the [io.github.brendonmendicino.aformvalidator.annotation.ParamState.used] parameter.
  *
  * # Examples
  *

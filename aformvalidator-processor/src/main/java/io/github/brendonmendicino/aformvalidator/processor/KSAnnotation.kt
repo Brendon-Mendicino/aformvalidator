@@ -1,10 +1,13 @@
 package io.github.brendonmendicino.aformvalidator.processor
 
 import com.google.devtools.ksp.symbol.KSAnnotation
+import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSType
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.ksp.toAnnotationSpec
-import io.github.brendonmendicino.aformvalidator.annotation.DependsOn
 import io.github.brendonmendicino.aformvalidator.annotation.Validator
+import io.github.brendonmendicino.aformvalidator.annotation.ValidatorCond
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.DependsOn
 
 private val LEAFS = listOf(
     Target::class,
@@ -13,7 +16,7 @@ private val LEAFS = listOf(
     MustBeDocumented::class,
 ).map { it.qualifiedName!! }
 
-val VALIDATOR = Validator::class.asTypeName()
+//val VALIDATOR = Validator::class.asTypeName()
 
 data class ValAnnotation(
     val validator: KSAnnotation,
@@ -51,4 +54,31 @@ fun KSAnnotation.dependencies(): List<String> {
     val dep = this.arguments.first { it.name?.asString() == DependsOn::dependencies.name }
 
     return (dep.value as ArrayList<*>).map { it as String }
+}
+
+private fun validatorCondError(type: KSType): KSType {
+    val classDeclaration = type.declaration as KSClassDeclaration
+
+    //    (classRefs.map {it as KSType}[0].declaration as KSClassDeclaration).superTypes.toList()[0].resolve().arguments[2]
+    // Get the superclasses, you must find a ValidatorCond
+    val validatorCond = classDeclaration.superTypes.map { it.resolve() }
+        .first { it.declaration.qualifiedName?.asString() == ValidatorCond::class.qualifiedName }
+
+    return validatorCond.arguments[2].type!!.resolve()
+}
+
+/**
+ * Return a list of validator types `validator: ValidatorCond<...>` and validator
+ * error types `ValidatorCond<*, *, ErrorType>`.
+ */
+fun KSAnnotation.validatorClasses(): List<Pair<KSType, KSType>> {
+    val validatedByArg = this.arguments
+        .firstOrNull { it.name?.asString() == Validator::validatedBy.name }
+        ?: return emptyList()
+
+    // validatedBy is vararg -> stored as List<*>
+    val classRefs = validatedByArg.value as List<*>
+
+    return classRefs.map { element -> element as KSType }
+        .map { validator -> validator to validatorCondError(validator) }
 }

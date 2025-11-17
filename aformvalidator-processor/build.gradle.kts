@@ -19,7 +19,6 @@ kotlin {
 dependencies {
     implementation(libs.ksp)
     implementation(libs.kotlin.stdlib)
-    implementation(libs.bundles.kotlin.result)
     implementation(libs.bundles.kotlinpoet)
     implementation(project(":aformvalidator-annotation"))
 

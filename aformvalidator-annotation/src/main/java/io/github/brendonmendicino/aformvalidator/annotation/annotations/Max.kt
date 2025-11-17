@@ -1,4 +1,7 @@
-package io.github.brendonmendicino.aformvalidator.annotation
+package io.github.brendonmendicino.aformvalidator.annotation.annotations
+
+import io.github.brendonmendicino.aformvalidator.annotation.Validator
+import io.github.brendonmendicino.aformvalidator.annotation.validators.MaxValidator
 
 /**
  * Check if a [Number] is greater than [max]. The validator
@@ -24,27 +27,11 @@ package io.github.brendonmendicino.aformvalidator.annotation
  * println(state.errors.firstOrNull()) // null
  * ```
  */
-@Validator<ValidationError>(
-    value = Max.Companion.Validator::class,
-    errorType = ValidationError::class,
-)
+@Validator(MaxValidator::class)
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.ANNOTATION_CLASS)
 @Retention(AnnotationRetention.SOURCE)
 @Repeatable
 @MustBeDocumented
 public annotation class Max(
     val max: Long
-) {
-    public companion object {
-        public class Validator(public val max: Long) :
-            ValidatorCond<Number?, ValidationError> {
-            override val conditions: List<(Number?) -> ValidationError?> = listOf {
-                it ?: return@listOf null
-
-                if (it.toLong() > max) ValidationError.Max(max = max)
-                else null
-            }
-
-        }
-    }
-}
+)

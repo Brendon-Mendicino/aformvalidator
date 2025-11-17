@@ -1,9 +1,9 @@
 package io.github.brendonmendicino.aformvalidator.sampleapp
 
-import io.github.brendonmendicino.aformvalidator.annotation.DependsOn
-import io.github.brendonmendicino.aformvalidator.annotation.FormState
-import io.github.brendonmendicino.aformvalidator.annotation.Min
-import io.github.brendonmendicino.aformvalidator.annotation.ToNumber
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.DependsOn
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.FormState
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.Min
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.ToNumber
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull

@@ -10,7 +10,6 @@ activityCompose = "1.10.1"
 composeBom = "2024.09.00"
 jetbrainsKotlinJvm = "2.0.21"
 ksp = "2.0.21-1.0.25"
-kotlinResult = "2.0.1"
 junitJupiter = "5.12.2"
 assertk = "0.28.1"
 appcompat = "1.7.1"
@@ -37,10 +36,6 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 ksp = { group = "com.google.devtools.ksp", name = "symbol-processing-api", version.ref = "ksp" }
-
-# Kotlin result type
-kotlin-result = { group = "com.michael-bull.kotlin-result", name = "kotlin-result", version.ref = "kotlinResult" }
-kotlin-result-coroutines = { group = "com.michael-bull.kotlin-result", name = "kotlin-result-coroutines", version.ref = "kotlinResult" }
 
 # KotlinPoet
 kotlinpoet = { group = "com.squareup", name = "kotlinpoet", version.ref = "kotlinpoet" }
@@ -71,5 +66,4 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 [bundles]
 unittest = ["junit-jupiter-api", "junit-jupiter-engine", "junit-jupiter-params", "assertk"]
-kotlin-result = ["kotlin-result", "kotlin-result-coroutines"]
 kotlinpoet = ["kotlinpoet", "kotlinpoet-ksp"]

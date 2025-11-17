@@ -1,12 +1,14 @@
 package io.github.brendonmendicino.aformvalidator.processor
 
+import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.STAR
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asTypeName
+import com.squareup.kotlinpoet.joinToCode
 import io.github.brendonmendicino.aformvalidator.annotation.ParamState
 import io.github.brendonmendicino.aformvalidator.annotation.ValidatorCond
 
@@ -49,33 +51,30 @@ class PropertyParamState(
             .build()
     }
 
+    fun AnnotationSpec.toConstructorCall(): CodeBlock {
+        val type = typeName
+        val args = members.joinToCode(", ")
+        return CodeBlock.of("%T(%L)", type, args)
+    }
+
     fun toInitializer(value: CodeBlock, used: CodeBlock? = null): CodeBlock {
         val condType = ValidatorCond::class.asTypeName()
-            .parameterizedBy(property.type, property.errorType)
+            .parameterizedBy(property.type, STAR, property.errorType)
+
+        val validatorList = property.validators.zip(property.validatorImpls)
+            .map { (validatorType, validatorImpl) ->
+                CodeBlock.of("%T(%L)", validatorType, validatorImpl.toConstructorCall())
+            }
 
         return CodeBlock.builder()
             .add("%T(", paramStateType)
-            .add("value = ")
-            .add(value)
-            .add(", ")
-            .add("conditions = listOf<%T>(", condType)
-            .apply {
-                for ((validator, impl) in property.validators.zip(property.validatorImpls)) {
-                    add("%T(", validator)
-                    for (member in impl.members) {
-                        add(member)
-                        add(", ")
-                    }
-                    add("), ")
-                }
-            }
-            .add(").%M { it.conditions }, ", MemberName("kotlin.collections", "flatMap"))
-            .apply {
-                if (used != null) {
-                    add("used = ")
-                    add(used)
-                    add(", ")
-                }
+            .add("value = %L, ", value)
+            .add("conditions = listOf<%T>(%L), ", condType, validatorList.joinToCode(", "))
+            .run {
+                if (used != null)
+                    add("used = %L, ", used)
+                else
+                    this
             }
             .add(")")
             .build()
