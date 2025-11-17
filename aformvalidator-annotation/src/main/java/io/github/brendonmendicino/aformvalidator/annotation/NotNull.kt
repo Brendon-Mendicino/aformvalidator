@@ -8,4 +8,4 @@ package io.github.brendonmendicino.aformvalidator.annotation
 @Retention(AnnotationRetention.SOURCE)
 @Repeatable
 @MustBeDocumented
-public annotation class NotNull()
+public annotation class NotNull

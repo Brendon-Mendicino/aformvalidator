@@ -29,5 +29,5 @@ import kotlin.reflect.KClass
 @Repeatable
 @MustBeDocumented
 public annotation class ToNumber(
-    val numberClass: KClass<out Number>
+    val numberClass: KClass<out Number>,
 )

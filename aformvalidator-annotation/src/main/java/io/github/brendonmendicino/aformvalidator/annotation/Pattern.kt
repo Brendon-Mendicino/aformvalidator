@@ -13,5 +13,5 @@ import org.intellij.lang.annotations.Language
 @MustBeDocumented
 public annotation class Pattern(
     @Language("RegExp")
-    public val regex: String = ""
+    val regex: String = ""
 )
