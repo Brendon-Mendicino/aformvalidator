@@ -1,8 +1,8 @@
 package io.github.brendonmendicino.aformvalidator.annotation.validators
 
-import io.github.brendonmendicino.aformvalidator.annotation.NotBlank
-import io.github.brendonmendicino.aformvalidator.annotation.ValidationError.NotBlankErr
 import io.github.brendonmendicino.aformvalidator.annotation.ValidatorCond
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.NotBlank
+import io.github.brendonmendicino.aformvalidator.annotation.error.ValidationError.NotBlankErr
 
 public class NotBlankValidator(
     override val annotation: NotBlank

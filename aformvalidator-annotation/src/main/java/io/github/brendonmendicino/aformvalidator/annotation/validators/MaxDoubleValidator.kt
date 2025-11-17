@@ -1,8 +1,8 @@
 package io.github.brendonmendicino.aformvalidator.annotation.validators
 
-import io.github.brendonmendicino.aformvalidator.annotation.MaxDouble
-import io.github.brendonmendicino.aformvalidator.annotation.ValidationError.MaxDoubleErr
 import io.github.brendonmendicino.aformvalidator.annotation.ValidatorCond
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.MaxDouble
+import io.github.brendonmendicino.aformvalidator.annotation.error.ValidationError.MaxDoubleErr
 
 public class MaxDoubleValidator(override val annotation: MaxDouble) :
     ValidatorCond<Number?, MaxDouble, MaxDoubleErr>(annotation) {

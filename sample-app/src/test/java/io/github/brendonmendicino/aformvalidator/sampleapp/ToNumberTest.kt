@@ -1,7 +1,7 @@
 package io.github.brendonmendicino.aformvalidator.sampleapp
 
-import io.github.brendonmendicino.aformvalidator.annotation.FormState
-import io.github.brendonmendicino.aformvalidator.annotation.ToNumber
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.FormState
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.ToNumber
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test

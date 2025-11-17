@@ -1,8 +1,8 @@
 package io.github.brendonmendicino.aformvalidator.annotation.validators
 
-import io.github.brendonmendicino.aformvalidator.annotation.ToNumber
-import io.github.brendonmendicino.aformvalidator.annotation.ValidationError.ToNumberErr
 import io.github.brendonmendicino.aformvalidator.annotation.ValidatorCond
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.ToNumber
+import io.github.brendonmendicino.aformvalidator.annotation.error.ValidationError.ToNumberErr
 import java.math.BigDecimal
 import java.math.BigInteger
 

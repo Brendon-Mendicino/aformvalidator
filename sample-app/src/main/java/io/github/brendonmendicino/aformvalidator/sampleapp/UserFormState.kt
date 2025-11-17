@@ -1,15 +1,15 @@
 package io.github.brendonmendicino.aformvalidator.sampleapp
 
 import androidx.annotation.StringRes
-import io.github.brendonmendicino.aformvalidator.annotation.DependsOn
-import io.github.brendonmendicino.aformvalidator.annotation.Email
-import io.github.brendonmendicino.aformvalidator.annotation.FormState
-import io.github.brendonmendicino.aformvalidator.annotation.Min
-import io.github.brendonmendicino.aformvalidator.annotation.NotBlank
-import io.github.brendonmendicino.aformvalidator.annotation.Pattern
-import io.github.brendonmendicino.aformvalidator.annotation.Size
-import io.github.brendonmendicino.aformvalidator.annotation.ToNumber
-import io.github.brendonmendicino.aformvalidator.annotation.ValidationError
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.DependsOn
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.Email
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.FormState
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.Min
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.NotBlank
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.Pattern
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.Size
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.ToNumber
+import io.github.brendonmendicino.aformvalidator.annotation.error.ValidationError
 
 @FormState
 data class UserFormState(

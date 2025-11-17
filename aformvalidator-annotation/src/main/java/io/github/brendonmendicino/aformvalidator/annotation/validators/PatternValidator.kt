@@ -1,8 +1,8 @@
 package io.github.brendonmendicino.aformvalidator.annotation.validators
 
-import io.github.brendonmendicino.aformvalidator.annotation.Pattern
-import io.github.brendonmendicino.aformvalidator.annotation.ValidationError.PatternErr
 import io.github.brendonmendicino.aformvalidator.annotation.ValidatorCond
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.Pattern
+import io.github.brendonmendicino.aformvalidator.annotation.error.ValidationError.PatternErr
 
 public class PatternValidator(
     override val annotation: Pattern

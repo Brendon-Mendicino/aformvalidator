@@ -1,8 +1,8 @@
 package io.github.brendonmendicino.aformvalidator.annotation.validators
 
-import io.github.brendonmendicino.aformvalidator.annotation.MinDouble
-import io.github.brendonmendicino.aformvalidator.annotation.ValidationError.MinDoubleErr
 import io.github.brendonmendicino.aformvalidator.annotation.ValidatorCond
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.MinDouble
+import io.github.brendonmendicino.aformvalidator.annotation.error.ValidationError.MinDoubleErr
 
 public class MinDoubleValidator(override val annotation: MinDouble) :
     ValidatorCond<Number?, MinDouble, MinDoubleErr>(annotation) {

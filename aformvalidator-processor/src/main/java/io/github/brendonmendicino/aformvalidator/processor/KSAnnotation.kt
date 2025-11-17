@@ -5,9 +5,9 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.ksp.toAnnotationSpec
-import io.github.brendonmendicino.aformvalidator.annotation.DependsOn
 import io.github.brendonmendicino.aformvalidator.annotation.Validator
 import io.github.brendonmendicino.aformvalidator.annotation.ValidatorCond
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.DependsOn
 
 private val LEAFS = listOf(
     Target::class,
@@ -16,7 +16,7 @@ private val LEAFS = listOf(
     MustBeDocumented::class,
 ).map { it.qualifiedName!! }
 
-val VALIDATOR = Validator::class.asTypeName()
+//val VALIDATOR = Validator::class.asTypeName()
 
 data class ValAnnotation(
     val validator: KSAnnotation,

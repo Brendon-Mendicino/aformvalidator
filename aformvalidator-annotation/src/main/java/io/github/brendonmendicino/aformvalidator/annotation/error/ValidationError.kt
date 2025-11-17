@@ -1,4 +1,15 @@
-package io.github.brendonmendicino.aformvalidator.annotation
+package io.github.brendonmendicino.aformvalidator.annotation.error
+
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.Email
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.Max
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.MaxDouble
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.Min
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.MinDouble
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.NotBlank
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.NotNull
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.Pattern
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.Size
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.ToNumber
 
 public sealed interface ValidationError<A : Annotation> : BindError<A> {
     public data class NotBlankErr(override val annotation: NotBlank) : ValidationError<NotBlank>

@@ -1,8 +1,8 @@
 package io.github.brendonmendicino.aformvalidator.annotation.validators
 
-import io.github.brendonmendicino.aformvalidator.annotation.Email
-import io.github.brendonmendicino.aformvalidator.annotation.ValidationError.EmailErr
 import io.github.brendonmendicino.aformvalidator.annotation.ValidatorCond
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.Email
+import io.github.brendonmendicino.aformvalidator.annotation.error.ValidationError.EmailErr
 
 public class EmailValidator(override val annotation: Email) :
     ValidatorCond<CharSequence?, Email, EmailErr>(annotation) {

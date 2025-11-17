@@ -1,4 +1,6 @@
-package io.github.brendonmendicino.aformvalidator.annotation
+package io.github.brendonmendicino.aformvalidator.annotation.annotations
+
+import io.github.brendonmendicino.aformvalidator.annotation.Validator
 
 /**
  * A type should not be null.

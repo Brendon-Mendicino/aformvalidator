@@ -1,8 +1,8 @@
 package io.github.brendonmendicino.aformvalidator.annotation.validators
 
-import io.github.brendonmendicino.aformvalidator.annotation.Size
-import io.github.brendonmendicino.aformvalidator.annotation.ValidationError.SizeErr
 import io.github.brendonmendicino.aformvalidator.annotation.ValidatorCond
+import io.github.brendonmendicino.aformvalidator.annotation.annotations.Size
+import io.github.brendonmendicino.aformvalidator.annotation.error.ValidationError.SizeErr
 
 public class SizeValidator(
     override val annotation: Size
