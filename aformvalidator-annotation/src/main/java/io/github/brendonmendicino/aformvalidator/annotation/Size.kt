@@ -1,5 +1,7 @@
 package io.github.brendonmendicino.aformvalidator.annotation
 
+import io.github.brendonmendicino.aformvalidator.annotation.validators.SizeValidator
+
 /**
  * Validate with upper and lower bounds.
  *
@@ -27,10 +29,7 @@ package io.github.brendonmendicino.aformvalidator.annotation
  * println(withElements.list.error) // null
  * ```
  */
-@Validator<ValidationError>(
-    value = Size.Companion.Validator::class,
-    errorType = ValidationError::class,
-)
+@Validator(SizeValidator::class)
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.ANNOTATION_CLASS)
 @Retention(AnnotationRetention.SOURCE)
 @Repeatable
@@ -38,29 +37,4 @@ package io.github.brendonmendicino.aformvalidator.annotation
 public annotation class Size(
     val min: Int = 0,
     val max: Int = Int.MAX_VALUE,
-) {
-    public companion object {
-        public class Validator(
-            public val min: Int,
-            public val max: Int,
-        ) : ValidatorCond<Any?, ValidationError> {
-            override val conditions: List<(Any?) -> ValidationError?> = listOf(
-                {
-                    if (it !is Collection<*>) null
-                    else if (min <= it.size && it.size <= max) null
-                    else ValidationError.Size(min = min, max = max)
-                },
-                {
-                    if (it !is CharSequence) null
-                    else if (min <= it.length && it.length <= max) null
-                    else ValidationError.Size(min = min, max = max)
-                },
-                {
-                    if (it !is Map<*, *>) null
-                    else if (min <= it.size && it.size <= max) null
-                    else ValidationError.Size(min = min, max = max)
-                },
-            )
-        }
-    }
-}
+)

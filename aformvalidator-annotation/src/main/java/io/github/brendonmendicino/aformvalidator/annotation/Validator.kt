@@ -1,6 +1,5 @@
 package io.github.brendonmendicino.aformvalidator.annotation
 
-import java.text.SimpleDateFormat
 import kotlin.reflect.KClass
 
 /**
@@ -54,7 +53,6 @@ import kotlin.reflect.KClass
 @Retention(AnnotationRetention.BINARY)
 @MustBeDocumented
 @Repeatable
-public annotation class Validator<E : Any>(
-    val value: KClass<out ValidatorCond<*, E>>,
-    val errorType: KClass<out E>,
+public annotation class Validator(
+    vararg val validatedBy: KClass<out ValidatorCond<*, *, *>>,
 )

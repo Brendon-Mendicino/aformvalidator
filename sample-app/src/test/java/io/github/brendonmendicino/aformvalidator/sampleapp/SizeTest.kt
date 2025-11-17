@@ -84,7 +84,7 @@ class SizeTest {
     @Test
     fun string_with_not_blank_full_bank_is_error() {
         val s = SizeNotBlank("    ").toValidator()
-        assertEquals(s.str.error, ValidationError.NotBlank)
+        assertEquals(s.str.error?.run { this::class }, ValidationError.NotBlankErr::class)
     }
 }
 

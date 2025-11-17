@@ -1,5 +1,7 @@
 package io.github.brendonmendicino.aformvalidator.annotation
 
+import io.github.brendonmendicino.aformvalidator.annotation.validators.NotBlankValidator
+
 /**
  * Validate a [String]. It needs to have at least one non-white character.
  *
@@ -19,22 +21,8 @@ package io.github.brendonmendicino.aformvalidator.annotation
  * println(person.name.error) // null
  * ```
  */
-@Validator<ValidationError>(
-    value = NotBlank.Companion.Validator::class,
-    errorType = ValidationError::class,
-)
+@Validator(NotBlankValidator::class)
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.ANNOTATION_CLASS)
 @Retention(AnnotationRetention.SOURCE)
 @MustBeDocumented
-public annotation class NotBlank {
-
-    public companion object {
-        public class Validator : ValidatorCond<String?, ValidationError> {
-            override val conditions: List<(String?) -> ValidationError?> = listOf { str ->
-                if (str == null) null
-                else if (str.isBlank()) ValidationError.NotBlank
-                else null
-            }
-        }
-    }
-}
+public annotation class NotBlank

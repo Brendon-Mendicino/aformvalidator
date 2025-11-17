@@ -1,19 +1,15 @@
 package io.github.brendonmendicino.aformvalidator.annotation
 
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
-import com.github.michaelbull.result.getErrorOr
-import com.github.michaelbull.result.mapResult
-
 public data class ParamState<T, out E : Any>(
     public val value: T,
-    public val conditions: List<(T) -> E?> = emptyList(),
+    public val conditions: List<ValidatorCond<T, *, E>> = emptyList(),
     public val used: Boolean = false,
 ) {
     public val error: E?
         get() = conditions
-            .mapResult { condition -> condition(value)?.let { Err(it) } ?: Ok(Unit) }
-            .getErrorOr(null)
+            .asSequence()
+            .mapNotNull { cond -> cond.isValid(value) }
+            .firstOrNull()
 
     public val isError: Boolean = used && error != null
 

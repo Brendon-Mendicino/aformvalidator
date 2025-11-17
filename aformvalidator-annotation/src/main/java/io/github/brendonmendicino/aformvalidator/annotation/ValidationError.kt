@@ -1,16 +1,14 @@
 package io.github.brendonmendicino.aformvalidator.annotation
 
-import kotlin.reflect.KClass
-
-public sealed class ValidationError {
-    public data object NotBlank : ValidationError()
-    public data class Size(val min: Int, val max: Int) : ValidationError()
-    public data class Pattern(val regex: String) : ValidationError()
-    public data object Email : ValidationError()
-    public data class Min(val min: Long) : ValidationError()
-    public data class Max(val max: Long) : ValidationError()
-    public data class MinDouble(val min: Double) : ValidationError()
-    public data class MaxDouble(val max: Double) : ValidationError()
-    public data class ToNumber(val numberClass: KClass<out Number>) : ValidationError()
-    public data object NotNull : ValidationError()
+public sealed interface ValidationError<A : Annotation> : BindError<A> {
+    public data class NotBlankErr(override val annotation: NotBlank) : ValidationError<NotBlank>
+    public data class SizeErr(override val annotation: Size) : ValidationError<Size>
+    public data class PatternErr(override val annotation: Pattern) : ValidationError<Pattern>
+    public data class EmailErr(override val annotation: Email) : ValidationError<Email>
+    public data class MinErr(override val annotation: Min) : ValidationError<Min>
+    public data class MaxErr(override val annotation: Max) : ValidationError<Max>
+    public data class MinDoubleErr(override val annotation: MinDouble) : ValidationError<MinDouble>
+    public data class MaxDoubleErr(override val annotation: MaxDouble) : ValidationError<MaxDouble>
+    public data class ToNumberErr(override val annotation: ToNumber) : ValidationError<ToNumber>
+    public data class NotNullErr(override val annotation: NotNull) : ValidationError<NotNull>
 }

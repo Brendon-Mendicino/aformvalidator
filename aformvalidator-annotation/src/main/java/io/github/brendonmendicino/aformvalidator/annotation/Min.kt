@@ -1,5 +1,7 @@
 package io.github.brendonmendicino.aformvalidator.annotation
 
+import io.github.brendonmendicino.aformvalidator.annotation.validators.MinValidator
+
 
 /**
  * Check if a [Number] is smaller than [min]. The validator
@@ -25,27 +27,11 @@ package io.github.brendonmendicino.aformvalidator.annotation
  * println(state.errors.firstOrNull()) // null
  * ```
  */
-@Validator<ValidationError>(
-    value = Min.Companion.Validator::class,
-    errorType = ValidationError::class,
-)
+@Validator(MinValidator::class)
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.ANNOTATION_CLASS)
 @Retention(AnnotationRetention.SOURCE)
 @Repeatable
 @MustBeDocumented
 public annotation class Min(
     val min: Long
-) {
-    public companion object {
-        public class Validator(public val min: Long) :
-            ValidatorCond<Number?, ValidationError> {
-            override val conditions: List<(Number?) -> ValidationError?> = listOf {
-                it ?: return@listOf null
-
-                if (it.toLong() < min) ValidationError.Min(min = min)
-                else null
-            }
-
-        }
-    }
-}
+)

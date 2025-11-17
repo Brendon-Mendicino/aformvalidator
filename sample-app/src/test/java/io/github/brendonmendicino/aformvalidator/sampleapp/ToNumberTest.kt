@@ -10,7 +10,8 @@ class ToNumberTest {
     @FormState
     data class PersonToNumber(
         val name: String = "",
-        @ToNumber(Int::class) val age: String = ""
+        @ToNumber(Int::class)
+        val age: String = ""
     )
 
     @Test

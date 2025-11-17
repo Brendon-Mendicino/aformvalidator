@@ -21,10 +21,10 @@ class ValidationErrorMappingTest {
     @Test
     fun errors_map_to_sealed_types() {
         val v = M().toValidator()
-        assertTrue(v.s.error is ValidationError.NotBlank)
-        assertTrue(v.a.error is ValidationError.Min)
-        assertTrue(v.b.error is ValidationError.Max)
-        assertTrue(v.c.error is ValidationError.Size)
+        assertTrue(v.s.error is ValidationError.NotBlankErr)
+        assertTrue(v.a.error is ValidationError.MinErr)
+        assertTrue(v.b.error is ValidationError.MaxErr)
+        assertTrue(v.c.error is ValidationError.SizeErr)
     }
 }
 

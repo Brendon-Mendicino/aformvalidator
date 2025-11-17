@@ -34,7 +34,7 @@ data class UserFormState(
 }
 
 @StringRes
-fun ValidationError.asRes(): Int = when (this) {
-    is ValidationError.NotBlank -> R.string.the_current_field_should_not_be_empty
+fun ValidationError<*>.asRes(): Int = when (this) {
+    is ValidationError.NotBlankErr -> R.string.the_current_field_should_not_be_empty
     else -> R.string.app_name
 }
