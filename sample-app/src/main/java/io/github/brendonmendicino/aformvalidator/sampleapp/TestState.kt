@@ -1,6 +1,6 @@
 package io.github.brendonmendicino.aformvalidator.sampleapp
 
-import io.github.brendonmendicino.aformvalidator.annotation.annotations.FormState
+import io.github.brendonmendicino.aformvalidator.annotation.FormState
 
 @FormState
 data class TestState(

@@ -1,9 +1,9 @@
 package io.github.brendonmendicino.aformvalidator.sampleapp
 
 import androidx.annotation.StringRes
+import io.github.brendonmendicino.aformvalidator.annotation.FormState
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.DependsOn
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.Email
-import io.github.brendonmendicino.aformvalidator.annotation.annotations.FormState
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.Min
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.NotBlank
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.Pattern
