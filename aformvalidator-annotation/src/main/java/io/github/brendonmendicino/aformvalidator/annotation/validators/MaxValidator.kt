@@ -1,8 +1,8 @@
 package io.github.brendonmendicino.aformvalidator.annotation.validators
 
-import io.github.brendonmendicino.aformvalidator.annotation.ValidatorCond
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.Max
 import io.github.brendonmendicino.aformvalidator.annotation.error.ValidationError.MaxErr
+import io.github.brendonmendicino.aformvalidator.core.ValidatorCond
 
 public class MaxValidator(override val annotation: Max) :
     ValidatorCond<Number?, Max, MaxErr>(annotation) {

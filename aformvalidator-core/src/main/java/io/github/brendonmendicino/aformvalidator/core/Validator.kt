@@ -1,4 +1,4 @@
-package io.github.brendonmendicino.aformvalidator.annotation
+package io.github.brendonmendicino.aformvalidator.core
 
 import kotlin.reflect.KClass
 

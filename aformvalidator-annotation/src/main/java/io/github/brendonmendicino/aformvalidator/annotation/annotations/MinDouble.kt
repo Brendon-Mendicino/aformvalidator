@@ -1,7 +1,9 @@
 package io.github.brendonmendicino.aformvalidator.annotation.annotations
 
-import io.github.brendonmendicino.aformvalidator.annotation.Validator
 import io.github.brendonmendicino.aformvalidator.annotation.validators.MinDoubleValidator
+import io.github.brendonmendicino.aformvalidator.core.Metadata
+import io.github.brendonmendicino.aformvalidator.core.Validator
+import kotlin.reflect.KClass
 
 /**
  * Same as [Min] but the value can be a [Double].
@@ -12,5 +14,6 @@ import io.github.brendonmendicino.aformvalidator.annotation.validators.MinDouble
 @Repeatable
 @MustBeDocumented
 public annotation class MinDouble(
+    val metadata: KClass<out Metadata>,
     val min: Double
 )

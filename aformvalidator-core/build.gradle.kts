@@ -20,6 +20,5 @@ kotlin {
 }
 
 dependencies {
-    implementation(project(":aformvalidator-core"))
     implementation(libs.kotlin.stdlib)
 }

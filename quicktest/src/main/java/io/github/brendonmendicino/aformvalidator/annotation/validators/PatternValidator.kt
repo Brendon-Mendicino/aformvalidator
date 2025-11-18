@@ -1,9 +1,5 @@
 package io.github.brendonmendicino.aformvalidator.annotation.validators
 
-import io.github.brendonmendicino.aformvalidator.annotation.annotations.Pattern
-import io.github.brendonmendicino.aformvalidator.annotation.error.ValidationError.PatternErr
-import io.github.brendonmendicino.aformvalidator.core.ValidatorCond
-
 public class PatternValidator(
     override val annotation: Pattern
 ) : ValidatorCond<CharSequence?, Pattern, PatternErr>(annotation) {

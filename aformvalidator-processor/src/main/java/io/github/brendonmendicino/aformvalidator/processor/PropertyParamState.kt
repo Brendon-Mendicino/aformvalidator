@@ -9,8 +9,8 @@ import com.squareup.kotlinpoet.STAR
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.joinToCode
-import io.github.brendonmendicino.aformvalidator.annotation.ParamState
-import io.github.brendonmendicino.aformvalidator.annotation.ValidatorCond
+import io.github.brendonmendicino.aformvalidator.core.ParamState
+import io.github.brendonmendicino.aformvalidator.core.ValidatorCond
 
 class PropertyParamState(
     val property: Property,

@@ -1,9 +1,9 @@
-package io.github.brendonmendicino.aformvalidator.annotation.annotations
+package io.github.brendonmendicino.aformvalidator.core
 
 /**
  * Mark that a property depends on other properties of the class.
  *
- * Used to correctly updated the [io.github.brendonmendicino.aformvalidator.annotation.ParamState.used] parameter.
+ * Used to correctly updated the [ParamState.used] parameter.
  *
  * # Examples
  *

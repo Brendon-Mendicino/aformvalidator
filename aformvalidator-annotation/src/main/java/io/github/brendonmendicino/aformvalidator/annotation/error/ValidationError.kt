@@ -11,6 +11,19 @@ import io.github.brendonmendicino.aformvalidator.annotation.annotations.Pattern
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.Size
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.ToNumber
 
+//public sealed interface ValidationError<A : Annotation, M : Metadata> : BindError<A, M> {
+//    public data class NotBlankErr<M : Metadata>(override val metadata: M?, override val annotation: NotBlank) : ValidationError<NotBlank, M>
+//    public data class SizeErr<M: Metadata>(override val metadata: M?, override val annotation: Size) : ValidationError<Size, M>
+//    public data class PatternErr<M: Metadata>(override val metadata: M?, override val annotation: Pattern) : ValidationError<Pattern, M>
+//    public data class EmailErr<M: Metadata>(override val metadata: M?, override val annotation: Email) : ValidationError<Email, M>
+//    public data class MinErr<M: Metadata>(override val metadata: M?, override val annotation: Min) : ValidationError<Min, M>
+//    public data class MaxErr<M: Metadata>(override val metadata: M?, override val annotation: Max) : ValidationError<Max, M>
+//    public data class MinDoubleErr<M: Metadata>(override val metadata: M?, override val annotation: MinDouble) : ValidationError<MinDouble, M>
+//    public data class MaxDoubleErr<M: Metadata>(override val metadata: M?, override val annotation: MaxDouble) : ValidationError<MaxDouble, M>
+//    public data class ToNumberErr<M: Metadata>(override val metadata: M?, override val annotation: ToNumber) : ValidationError<ToNumber, M>
+//    public data class NotNullErr<M: Metadata>(override val metadata: M?, override val annotation: NotNull) : ValidationError<NotNull, M>
+//}
+
 public sealed interface ValidationError<A : Annotation> : BindError<A> {
     public data class NotBlankErr(override val annotation: NotBlank) : ValidationError<NotBlank>
     public data class SizeErr(override val annotation: Size) : ValidationError<Size>

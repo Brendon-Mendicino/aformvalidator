@@ -5,9 +5,9 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.ksp.toAnnotationSpec
-import io.github.brendonmendicino.aformvalidator.annotation.Validator
-import io.github.brendonmendicino.aformvalidator.annotation.ValidatorCond
-import io.github.brendonmendicino.aformvalidator.annotation.annotations.DependsOn
+import io.github.brendonmendicino.aformvalidator.core.DependsOn
+import io.github.brendonmendicino.aformvalidator.core.Validator
+import io.github.brendonmendicino.aformvalidator.core.ValidatorCond
 
 private val LEAFS = listOf(
     Target::class,

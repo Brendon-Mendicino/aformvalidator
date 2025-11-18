@@ -1,4 +1,4 @@
-package io.github.brendonmendicino.aformvalidator.annotation
+package io.github.brendonmendicino.aformvalidator.core
 
 /**
  * Annotate your class with [FormState] to generate the respective validator class.

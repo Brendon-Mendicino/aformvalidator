@@ -1,7 +1,7 @@
 package io.github.brendonmendicino.aformvalidator.annotation.annotations
 
-import io.github.brendonmendicino.aformvalidator.annotation.Validator
 import io.github.brendonmendicino.aformvalidator.annotation.validators.MaxValidator
+import io.github.brendonmendicino.aformvalidator.core.Validator
 
 /**
  * Check if a [Number] is greater than [max]. The validator
@@ -33,5 +33,6 @@ import io.github.brendonmendicino.aformvalidator.annotation.validators.MaxValida
 @Repeatable
 @MustBeDocumented
 public annotation class Max(
+//    val metadata: KClass<out Metadata>,
     val max: Long
 )

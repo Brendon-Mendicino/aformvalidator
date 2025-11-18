@@ -1,7 +1,9 @@
 package io.github.brendonmendicino.aformvalidator.annotation.annotations
 
-import io.github.brendonmendicino.aformvalidator.annotation.Validator
 import io.github.brendonmendicino.aformvalidator.annotation.validators.MinValidator
+import io.github.brendonmendicino.aformvalidator.core.Metadata
+import io.github.brendonmendicino.aformvalidator.core.Validator
+import kotlin.reflect.KClass
 
 
 /**
@@ -34,5 +36,6 @@ import io.github.brendonmendicino.aformvalidator.annotation.validators.MinValida
 @Repeatable
 @MustBeDocumented
 public annotation class Min(
+    val metadata: KClass<out Metadata>,
     val min: Long
 )

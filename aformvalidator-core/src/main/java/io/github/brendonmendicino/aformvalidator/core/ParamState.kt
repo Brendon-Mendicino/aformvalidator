@@ -1,8 +1,8 @@
-package io.github.brendonmendicino.aformvalidator.annotation
+package io.github.brendonmendicino.aformvalidator.core
 
-public data class ParamState<T, out E : Any>(
+public data class ParamState<T, out M : Metadata, out E : Any>(
     public val value: T,
-    public val conditions: List<ValidatorCond<T, *, E>> = emptyList(),
+    public val conditions: List<ValidatorCond<T, *, M, E>> = emptyList(),
     public val used: Boolean = false,
 ) {
     public val error: E?
