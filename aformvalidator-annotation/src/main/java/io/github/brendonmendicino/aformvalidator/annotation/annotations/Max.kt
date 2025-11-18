@@ -2,6 +2,7 @@ package io.github.brendonmendicino.aformvalidator.annotation.annotations
 
 import io.github.brendonmendicino.aformvalidator.annotation.validators.MaxValidator
 import io.github.brendonmendicino.aformvalidator.core.Validator
+import kotlin.reflect.KClass
 
 /**
  * Check if a [Number] is greater than [max]. The validator
@@ -33,6 +34,6 @@ import io.github.brendonmendicino.aformvalidator.core.Validator
 @Repeatable
 @MustBeDocumented
 public annotation class Max(
-//    val metadata: KClass<out Metadata>,
+    val metadata: KClass<out Metadata> = Nothing::class,
     val max: Long
 )

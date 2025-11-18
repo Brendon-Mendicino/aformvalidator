@@ -55,7 +55,17 @@ class ValidatorBuilder(
             val constructorParameters = clazz.getConstructorParameterNames().toSet()
             val (constructorProperties, bodyProperties) = clazz
                 .getAllProperties()
-                .map { prop -> Property.from(prop) }
+                .map { prop ->
+                    try {
+                        Property.from(prop)
+                    } catch (e: IllegalArgumentException) {
+                        globalLogger.error(
+                            "[aformvalidator] error while processing property of ${clazz.qualifiedName?.asString()}",
+                            prop
+                        )
+                        throw e
+                    }
+                }
                 .partition { prop -> prop.name in constructorParameters }
 
             return ValidatorBuilder(

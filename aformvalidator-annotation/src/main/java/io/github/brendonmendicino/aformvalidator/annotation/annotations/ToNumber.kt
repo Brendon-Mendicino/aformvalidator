@@ -31,6 +31,6 @@ import kotlin.reflect.KClass
 @Repeatable
 @MustBeDocumented
 public annotation class ToNumber(
-    val metadata: KClass<out Metadata>,
+    val metadata: KClass<out Metadata> = Nothing::class,
     val numberClass: KClass<out Number>,
 )

@@ -15,7 +15,7 @@ import kotlin.reflect.KClass
 @Repeatable
 @MustBeDocumented
 public annotation class Pattern(
-    val metadata: KClass<out Metadata>,
+    val metadata: KClass<out Metadata> = Nothing::class,
     @Language("RegExp")
     val regex: String = "",
 )

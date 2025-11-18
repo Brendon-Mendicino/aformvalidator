@@ -32,10 +32,10 @@ import kotlin.reflect.KClass
  */
 @Validator(MinValidator::class)
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.ANNOTATION_CLASS)
-@Retention(AnnotationRetention.SOURCE)
+@Retention(AnnotationRetention.BINARY)
 @Repeatable
 @MustBeDocumented
 public annotation class Min(
-    val metadata: KClass<out Metadata>,
+    val metadata: KClass<out Metadata> = Nothing::class,
     val min: Long
 )

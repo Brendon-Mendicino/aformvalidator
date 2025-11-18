@@ -38,7 +38,7 @@ import kotlin.reflect.KClass
 @Repeatable
 @MustBeDocumented
 public annotation class Size(
-    val metadata: KClass<out Metadata>,
+    val metadata: KClass<out Metadata> = Nothing::class,
     val min: Int = 0,
     val max: Int = Int.MAX_VALUE,
 )

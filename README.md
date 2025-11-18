@@ -27,6 +27,7 @@ plugins {
 }
 
 dependencies {
+    implementation("io.github.brendon-mendicino:aformvalidator-core:<version>")
     implementation("io.github.brendon-mendicino:aformvalidator-annotation:<version>")
     implementation("io.github.brendon-mendicino:aformvalidator-processor:<version>")
     ksp("io.github.brendon-mendicino:aformvalidator-processor:<version>")

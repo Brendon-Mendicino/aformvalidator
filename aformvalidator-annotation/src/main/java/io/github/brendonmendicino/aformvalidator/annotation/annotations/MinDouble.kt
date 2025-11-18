@@ -14,6 +14,6 @@ import kotlin.reflect.KClass
 @Repeatable
 @MustBeDocumented
 public annotation class MinDouble(
-    val metadata: KClass<out Metadata>,
+    val metadata: KClass<out Metadata> = Nothing::class,
     val min: Double
 )

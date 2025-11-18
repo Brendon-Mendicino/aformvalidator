@@ -2,13 +2,14 @@ package io.github.brendonmendicino.aformvalidator.annotation.validators
 
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.ToNumber
 import io.github.brendonmendicino.aformvalidator.annotation.error.ValidationError.ToNumberErr
+import io.github.brendonmendicino.aformvalidator.core.Metadata
 import io.github.brendonmendicino.aformvalidator.core.ValidatorCond
 import java.math.BigDecimal
 import java.math.BigInteger
 
 public class ToNumberValidator(
-    override val annotation: ToNumber
-) : ValidatorCond<String?, ToNumber, ToNumberErr>(annotation) {
+    override val metadata: Metadata?, override val annotation: ToNumber
+) : ValidatorCond<String?, ToNumber, ToNumberErr>(metadata, annotation) {
     override fun isValid(value: String?): ToNumberErr? {
         if (value == null) return null
         if (value.isBlank()) return null
@@ -26,6 +27,6 @@ public class ToNumberValidator(
         }
 
         return if (num != null) null
-        else ToNumberErr(annotation)
+        else ToNumberErr(metadata, annotation)
     }
 }

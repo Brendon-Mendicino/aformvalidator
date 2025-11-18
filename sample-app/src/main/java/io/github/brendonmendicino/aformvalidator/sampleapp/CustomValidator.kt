@@ -1,16 +1,17 @@
 package io.github.brendonmendicino.aformvalidator.sampleapp
 
 import android.annotation.SuppressLint
-import io.github.brendonmendicino.aformvalidator.annotation.FormState
-import io.github.brendonmendicino.aformvalidator.annotation.Validator
-import io.github.brendonmendicino.aformvalidator.annotation.ValidatorCond
+import io.github.brendonmendicino.aformvalidator.core.FormState
+import io.github.brendonmendicino.aformvalidator.core.Metadata
+import io.github.brendonmendicino.aformvalidator.core.Validator
+import io.github.brendonmendicino.aformvalidator.core.ValidatorCond
 import java.text.SimpleDateFormat
+import kotlin.reflect.KClass
 
-// The constructor parameters are the same that the annotation
-// takes.
 class LogMessageValidator(
+    override val metadata: Metadata?,
     override val annotation: LogMessage,
-) : ValidatorCond<String?, LogMessage, String>(annotation) {
+) : ValidatorCond<String?, LogMessage, String>(metadata, annotation) {
     @SuppressLint("SimpleDateFormat")
     override fun isValid(value: String?): String? {
         val input = value
@@ -33,6 +34,7 @@ class LogMessageValidator(
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.ANNOTATION_CLASS)
 @Retention(AnnotationRetention.SOURCE)
 annotation class LogMessage(
+    val metadata: KClass<out Metadata> = Nothing::class,
     val sections: Int = 3,
     val timestamp: String = "YYYY-MM-DD",
     val allowedModules: Array<String> = ["main", "test"],

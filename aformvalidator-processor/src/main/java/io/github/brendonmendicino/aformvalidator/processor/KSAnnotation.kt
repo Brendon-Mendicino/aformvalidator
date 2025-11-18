@@ -3,6 +3,7 @@ package io.github.brendonmendicino.aformvalidator.processor
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSType
+import com.google.devtools.ksp.symbol.KSValueArgument
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.ksp.toAnnotationSpec
 import io.github.brendonmendicino.aformvalidator.core.DependsOn
@@ -18,6 +19,11 @@ private val LEAFS = listOf(
 
 //val VALIDATOR = Validator::class.asTypeName()
 
+/**
+ * [validator] represents the [Validator] annotation, while
+ * [impl] represents the implementation for the validator
+ * with its own data.
+ */
 data class ValAnnotation(
     val validator: KSAnnotation,
     val impl: KSAnnotation,
@@ -82,3 +88,6 @@ fun KSAnnotation.validatorClasses(): List<Pair<KSType, KSType>> {
     return classRefs.map { element -> element as KSType }
         .map { validator -> validator to validatorCondError(validator) }
 }
+
+fun KSAnnotation.argumentByName(name: String): KSValueArgument? =
+    arguments.firstOrNull { it.name?.asString() == name }

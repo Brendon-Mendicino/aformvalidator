@@ -1,8 +1,6 @@
 package io.github.brendonmendicino.aformvalidator.sampleapp
 
 import androidx.annotation.StringRes
-import io.github.brendonmendicino.aformvalidator.annotation.FormState
-import io.github.brendonmendicino.aformvalidator.annotation.annotations.DependsOn
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.Email
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.Min
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.NotBlank
@@ -10,6 +8,8 @@ import io.github.brendonmendicino.aformvalidator.annotation.annotations.Pattern
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.Size
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.ToNumber
 import io.github.brendonmendicino.aformvalidator.annotation.error.ValidationError
+import io.github.brendonmendicino.aformvalidator.core.DependsOn
+import io.github.brendonmendicino.aformvalidator.core.FormState
 
 @FormState
 data class UserFormState(
@@ -19,16 +19,16 @@ data class UserFormState(
     @Email
     val email: String? = "",
     @NotBlank
-    @Pattern("hello")
+    @Pattern(regex = "hello")
     val test: String? = "",
     @Size(min = 1)
     val list: List<Int> = emptyList(),
-    @Min(7)
+    @Min(min = 7)
     val randomNumber: Int = 42,
-    @ToNumber(Int::class)
+    @ToNumber(numberClass = Int::class)
     val num: String = ""
 ) {
-    @Min(3)
+    @Min(min = 3)
     @DependsOn(["num"])
     val derived: Int? = num.toIntOrNull()
 }

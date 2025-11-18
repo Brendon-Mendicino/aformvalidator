@@ -29,5 +29,5 @@ import kotlin.reflect.KClass
 @Retention(AnnotationRetention.SOURCE)
 @MustBeDocumented
 public annotation class NotBlank(
-    val metadata: KClass<out Metadata>,
+    val metadata: KClass<out Metadata> = Nothing::class,
 )
