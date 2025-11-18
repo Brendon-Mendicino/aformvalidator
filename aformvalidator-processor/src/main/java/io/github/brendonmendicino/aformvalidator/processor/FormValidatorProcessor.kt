@@ -8,7 +8,7 @@ import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.squareup.kotlinpoet.ksp.writeTo
-import io.github.brendonmendicino.aformvalidator.annotation.annotations.FormState
+import io.github.brendonmendicino.aformvalidator.core.FormState
 
 lateinit var globalLogger: KSPLogger
 

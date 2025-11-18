@@ -23,3 +23,5 @@ rootProject.name = "aformvalidator"
 include(":sample-app")
 include(":aformvalidator-annotation")
 include(":aformvalidator-processor")
+include(":aformvalidator-core")
+include(":quicktest")

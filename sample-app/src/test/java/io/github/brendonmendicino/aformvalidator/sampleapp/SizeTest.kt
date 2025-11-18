@@ -1,9 +1,9 @@
 package io.github.brendonmendicino.aformvalidator.sampleapp
 
-import io.github.brendonmendicino.aformvalidator.annotation.annotations.FormState
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.NotBlank
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.Size
 import io.github.brendonmendicino.aformvalidator.annotation.error.ValidationError
+import io.github.brendonmendicino.aformvalidator.core.FormState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -11,16 +11,16 @@ import org.junit.Test
 
 class SizeTest {
     @FormState
-    data class BoundList(@Size(2, 10) val list: List<Int>)
+    data class BoundList(@Size(min = 2, max = 10) val list: List<Int>)
 
     @FormState
-    data class BoundString(@Size(2, 10) val str: String)
+    data class BoundString(@Size(min = 2, max = 10) val str: String)
 
     @FormState
-    data class BoundMap(@Size(2, 10) val map: Map<Any, Any>)
+    data class BoundMap(@Size(min = 2, max = 10) val map: Map<Any, Any>)
 
     @FormState
-    data class SomethingElse(@Size(2, 10) val num: Long)
+    data class SomethingElse(@Size(min = 2, max = 10) val num: Long)
 
     @FormState
     data class SizeNotBlank(

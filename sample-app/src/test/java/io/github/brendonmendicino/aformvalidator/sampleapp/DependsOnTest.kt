@@ -1,9 +1,9 @@
 package io.github.brendonmendicino.aformvalidator.sampleapp
 
-import io.github.brendonmendicino.aformvalidator.annotation.annotations.DependsOn
-import io.github.brendonmendicino.aformvalidator.annotation.annotations.FormState
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.Min
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.ToNumber
+import io.github.brendonmendicino.aformvalidator.core.DependsOn
+import io.github.brendonmendicino.aformvalidator.core.FormState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -14,9 +14,9 @@ class DependsOnTest {
     @FormState
     data class FormDepends(
         /** Tutte a me capitano... */
-        @ToNumber(Int::class) val numStr: String = "",
+        @ToNumber(numberClass = Int::class) val numStr: String = "",
     ) {
-        @Min(0)
+        @Min(min = 0)
         @DependsOn(["numStr"])
         val num: Int? = numStr.toIntOrNull()
     }
@@ -24,9 +24,9 @@ class DependsOnTest {
     @FormState
     data class EmptyDepends(
         /** Tutte a me capitano... */
-        @ToNumber(Int::class) val numStr: String = ""
+        @ToNumber(numberClass = Int::class) val numStr: String = ""
     ) {
-        @Min(0)
+        @Min(min = 0)
         @DependsOn
         val num: Int? = numStr.toIntOrNull()
     }

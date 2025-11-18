@@ -1,11 +1,11 @@
 package io.github.brendonmendicino.aformvalidator.sampleapp
 
-import io.github.brendonmendicino.aformvalidator.annotation.annotations.FormState
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.Max
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.Min
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.NotBlank
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.Size
 import io.github.brendonmendicino.aformvalidator.annotation.error.ValidationError
+import io.github.brendonmendicino.aformvalidator.core.FormState
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -13,9 +13,9 @@ class ValidationErrorMappingTest {
     @FormState
     class M(
         @NotBlank val s: String? = " ",
-        @Min(5) val a: Int = 1,
-        @Max(10) val b: Int = 99,
-        @Size(2, 3) val c: List<Int> = listOf()
+        @Min(min = 5) val a: Int = 1,
+        @Max(max = 10) val b: Int = 99,
+        @Size(min = 2, max = 3) val c: List<Int> = listOf()
     )
 
     @Test

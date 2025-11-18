@@ -1,7 +1,9 @@
 package io.github.brendonmendicino.aformvalidator.annotation.annotations
 
-import io.github.brendonmendicino.aformvalidator.annotation.Validator
 import io.github.brendonmendicino.aformvalidator.annotation.validators.SizeValidator
+import io.github.brendonmendicino.aformvalidator.core.Metadata
+import io.github.brendonmendicino.aformvalidator.core.Validator
+import kotlin.reflect.KClass
 
 /**
  * Validate with upper and lower bounds.
@@ -36,6 +38,7 @@ import io.github.brendonmendicino.aformvalidator.annotation.validators.SizeValid
 @Repeatable
 @MustBeDocumented
 public annotation class Size(
+    val metadata: KClass<out Metadata> = Nothing::class,
     val min: Int = 0,
     val max: Int = Int.MAX_VALUE,
 )

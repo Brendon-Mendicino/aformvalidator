@@ -9,8 +9,8 @@ import com.squareup.kotlinpoet.STAR
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.joinToCode
-import io.github.brendonmendicino.aformvalidator.annotation.ParamState
-import io.github.brendonmendicino.aformvalidator.annotation.ValidatorCond
+import io.github.brendonmendicino.aformvalidator.core.ParamState
+import io.github.brendonmendicino.aformvalidator.core.ValidatorCond
 
 class PropertyParamState(
     val property: Property,
@@ -53,7 +53,10 @@ class PropertyParamState(
 
     fun AnnotationSpec.toConstructorCall(): CodeBlock {
         val type = typeName
-        val args = members.joinToCode(", ")
+        val args = members.map {
+            if (it.toString() == "metadata = java.lang.Void::class") CodeBlock.of("metadata = Nothing::class")
+            else it
+        }.joinToCode(", ")
         return CodeBlock.of("%T(%L)", type, args)
     }
 
@@ -61,10 +64,22 @@ class PropertyParamState(
         val condType = ValidatorCond::class.asTypeName()
             .parameterizedBy(property.type, STAR, property.errorType)
 
-        val validatorList = property.validators.zip(property.validatorImpls)
-            .map { (validatorType, validatorImpl) ->
-                CodeBlock.of("%T(%L)", validatorType, validatorImpl.toConstructorCall())
-            }
+        val validatorList = mutableListOf<CodeBlock>()
+
+        for (i in 0..<property.validators.size) {
+            val validatorCondType = property.validators[i]
+            val metadata = property.metadataInstantiations()[i]
+            val annotation = property.validatorImpls[i].toConstructorCall()
+
+            val code = CodeBlock.of(
+                "%T(metadata = %L, annotation = %L)",
+                validatorCondType,
+                metadata,
+                annotation,
+            )
+
+            validatorList += code
+        }
 
         return CodeBlock.builder()
             .add("%T(", paramStateType)

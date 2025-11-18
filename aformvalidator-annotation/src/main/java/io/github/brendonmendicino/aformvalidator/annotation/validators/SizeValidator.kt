@@ -1,12 +1,13 @@
 package io.github.brendonmendicino.aformvalidator.annotation.validators
 
-import io.github.brendonmendicino.aformvalidator.annotation.ValidatorCond
 import io.github.brendonmendicino.aformvalidator.annotation.annotations.Size
 import io.github.brendonmendicino.aformvalidator.annotation.error.ValidationError.SizeErr
+import io.github.brendonmendicino.aformvalidator.core.Metadata
+import io.github.brendonmendicino.aformvalidator.core.ValidatorCond
 
 public class SizeValidator(
-    override val annotation: Size
-) : ValidatorCond<Any?, Size, SizeErr>(annotation) {
+    override val metadata: Metadata?, override val annotation: Size
+) : ValidatorCond<Any?, Size, SizeErr>(metadata, annotation) {
     override fun isValid(value: Any?): SizeErr? {
         val valid = when (value) {
             is Collection<*> -> annotation.min <= value.size && value.size <= annotation.max
@@ -16,6 +17,6 @@ public class SizeValidator(
         }
 
         return if (valid) null
-        else SizeErr(annotation)
+        else SizeErr(metadata, annotation)
     }
 }

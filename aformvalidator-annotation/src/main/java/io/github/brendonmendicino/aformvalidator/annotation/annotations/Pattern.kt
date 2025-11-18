@@ -1,8 +1,10 @@
 package io.github.brendonmendicino.aformvalidator.annotation.annotations
 
-import io.github.brendonmendicino.aformvalidator.annotation.Validator
 import io.github.brendonmendicino.aformvalidator.annotation.validators.PatternValidator
+import io.github.brendonmendicino.aformvalidator.core.Metadata
+import io.github.brendonmendicino.aformvalidator.core.Validator
 import org.intellij.lang.annotations.Language
+import kotlin.reflect.KClass
 
 /**
  * Validate a [String] against a [regex] pattern.
@@ -13,6 +15,7 @@ import org.intellij.lang.annotations.Language
 @Repeatable
 @MustBeDocumented
 public annotation class Pattern(
+    val metadata: KClass<out Metadata> = Nothing::class,
     @Language("RegExp")
-    val regex: String = ""
+    val regex: String = "",
 )

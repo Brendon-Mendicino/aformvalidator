@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.jvm)
     `publish-conventions`
 }
+
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
@@ -10,6 +11,7 @@ java {
     withJavadocJar()
     withSourcesJar()
 }
+
 kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
@@ -18,5 +20,6 @@ kotlin {
 }
 
 dependencies {
+    implementation(project(":aformvalidator-core"))
     implementation(libs.kotlin.stdlib)
 }

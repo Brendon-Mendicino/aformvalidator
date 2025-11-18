@@ -20,7 +20,7 @@ dependencies {
     implementation(libs.ksp)
     implementation(libs.kotlin.stdlib)
     implementation(libs.bundles.kotlinpoet)
-    implementation(project(":aformvalidator-annotation"))
+    implementation(project(":aformvalidator-core"))
 
     testImplementation(libs.bundles.unittest)
 //    // --- JUnit 5 (Jupiter) ---

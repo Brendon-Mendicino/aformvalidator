@@ -1,8 +1,9 @@
 package io.github.brendonmendicino.aformvalidator.annotation.annotations
 
-import io.github.brendonmendicino.aformvalidator.annotation.Validator
 import io.github.brendonmendicino.aformvalidator.annotation.validators.EmailValidator
+import io.github.brendonmendicino.aformvalidator.core.Validator
 import org.intellij.lang.annotations.Language
+import kotlin.reflect.KClass
 
 /**
  * Validate a [String] as a valid email.
@@ -30,6 +31,7 @@ import org.intellij.lang.annotations.Language
 @Retention(AnnotationRetention.SOURCE)
 @MustBeDocumented
 public annotation class Email(
+    val metadata: KClass<out Metadata> = Nothing::class,
     @Language("RegExp")
     val pattern: String = """\A[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\z"""
 )
